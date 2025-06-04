@@ -1,7 +1,6 @@
-import tickets from "@/components/Tickets/datos";
 import FilaTicket from "./FilaTicket";
 
-export default function TablaTickets() {
+export default function TablaTickets({ tickets }) {
   const headers = [
     "ID",
     "Nombre",

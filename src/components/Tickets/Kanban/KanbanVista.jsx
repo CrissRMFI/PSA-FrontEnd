@@ -1,9 +1,8 @@
-import tickets from "@/components/Tickets/datos";
 import ColumnaKanban from "./ColumnaKanban";
 
 const ESTADOS = ["Nuevo", "En Progreso", "Escalado", "Resuelto", "Cerrado"];
 
-export default function KanbanVista() {
+export default function KanbanVista({ tickets }) {
   const ticketsPorEstado = ESTADOS.map((estado) => ({
     estado,
     tickets: tickets.filter((t) => t.estado === estado),

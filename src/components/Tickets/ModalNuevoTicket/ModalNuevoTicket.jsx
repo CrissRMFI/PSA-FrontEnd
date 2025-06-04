@@ -2,7 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { Fragment } from "react";
 import FormularioTicket from "@/components/Tickets/ModalNuevoTicket/FormularioNuevoTicket";
 
-export default function ModalNuevoTicket({ isOpen, onClose }) {
+export default function ModalNuevoTicket({ isOpen, onClose, onCrearTicket }) {
   return (
     <Dialog open={isOpen} onClose={onClose} as={Fragment}>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -10,7 +10,7 @@ export default function ModalNuevoTicket({ isOpen, onClose }) {
           <Dialog.Title className="text-2xl font-semibold mb-4">
             Nuevo Ticket - PSA Spring ERP
           </Dialog.Title>
-          <FormularioTicket onClose={onClose} />
+          <FormularioTicket onClose={onClose} onCrearTicket={onCrearTicket} />
         </Dialog.Panel>
       </div>
     </Dialog>

@@ -1,18 +1,20 @@
 import setUp from "@/app/setUp";
 import { useState } from "react";
+import { addTicket } from "@/api/tickets";
 
-export default function FormularioTicket({ onClose }) {
+export default function FormularioTicket({ onClose, onCrearTicket }) {
   const [form, setForm] = useState({
-    titulo: "",
+    nombre: "",
     prioridad: "",
     severidad: "",
     cliente: "",
-    producto: "",
     modulo: "",
     version: "1",
-    customizado: false,
+    custom: false,
     descripcion: "",
   });
+
+  const [showError, setShowError] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,16 +24,40 @@ export default function FormularioTicket({ onClose }) {
     }));
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const estanTodosCompletos = Object.entries(form).every(([key, value]) => {
+      if (typeof value === "boolean") return true;
+      return value.trim?.() !== "";
+    });
+
+    if (!estanTodosCompletos) {
+      setShowError(true);
+      setTimeout(() => setShowError(false), 2000);
+      return;
+    }
+
+    const nuevo = addTicket(form);
+    onCrearTicket(nuevo);
+    onClose();
+  };
+
   return (
     <form className="space-y-4 text-sm">
+      {showError && (
+        <div className="mb-4 bg-red-500 p-2 rounded-md flex justify-center items-center font-extrabold text-white ">
+          Por favor, completá todos los campos.
+        </div>
+      )}
       <div>
         <label className="font-semibold block mb-1">Título:</label>
         <input
           type="text"
-          name="titulo"
+          name="nombre"
           placeholder="Título del incidente"
           className="border border-gray-300 rounded w-full px-2 py-1"
-          value={form.titulo}
+          value={form.nombre}
           onChange={handleChange}
         />
       </div>
@@ -100,8 +126,8 @@ export default function FormularioTicket({ onClose }) {
           <label className="font-semibold">Customizado</label>
           <input
             type="checkbox"
-            name="customizado"
-            checked={form.customizado}
+            name="custom"
+            checked={form.custom}
             onChange={handleChange}
           />
           <label className="font-semibold ml-4">Versión</label>
@@ -131,6 +157,7 @@ export default function FormularioTicket({ onClose }) {
         <button
           type="submit"
           className="bg-blue-200 hover:bg-blue-300 text-blue-900 font-semibold px-5 py-1.5 rounded"
+          onClick={handleSubmit}
         >
           GUARDAR
         </button>
