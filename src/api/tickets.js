@@ -61,19 +61,28 @@ const tickets = [
   },
 ];
 
+let idCounter = 6;
+
 export const getTickets = () => [...tickets];
 
 export const addTicket = (ticket) => {
   const nuevo = {
-    id: generarId(),
     estado: "Nuevo",
     sla: "0 días - 0%",
     area: "Nivel 1",
-    ...ticket,
+    custom: ticket.custom ? "sí" : "no",
+    nombre: ticket.nombre,
+    prioridad: ticket.prioridad,
+    severidad: ticket.severidad,
+    cliente: ticket.cliente,
+    modulo: ticket.modulo,
+    version: ticket.version || "1",
+    descripcion: ticket.descripcion,
   };
-  tickets.push(nuevo);
+
+  nuevo.id = generarId();
+
   return nuevo;
 };
 
-let idCounter = 6;
 const generarId = () => `ERP-00000${idCounter++}`;

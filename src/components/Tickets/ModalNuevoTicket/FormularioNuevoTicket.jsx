@@ -37,7 +37,6 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
       setTimeout(() => setShowError(false), 2000);
       return;
     }
-
     const nuevo = addTicket(form);
     onCrearTicket(nuevo);
     onClose();
