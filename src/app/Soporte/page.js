@@ -12,9 +12,27 @@ const SoportePage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [tickets, setTickets] = useState([]);
 
+  const [filtros, setFiltros] = useState({
+    producto: "",
+    severidad: "",
+    prioridad: "",
+    estado: "",
+    sla: "",
+  });
+
   useEffect(() => {
     setTickets(getTickets());
   }, []);
+
+  const ticketsFiltrados = tickets.filter((ticket) => {
+    return (
+      (filtros.producto === "" || ticket.producto === filtros.producto) &&
+      (filtros.severidad === "" || ticket.severidad == filtros.severidad) &&
+      (filtros.prioridad === "" || ticket.prioridad === filtros.prioridad) &&
+      (filtros.estado === "" || ticket.estado === filtros.estado) &&
+      (filtros.sla === "" || ticket.sla === filtros.sla)
+    );
+  });
 
   return (
     <div className="p-10">
@@ -22,10 +40,12 @@ const SoportePage = () => {
 
       <div className="mt-10">
         <Seleccionador
-          texto="Seleccionar Producto"
+          texto="Producto"
           vista={vista}
           onCambiarVista={setVista}
           onNuevoTicket={() => setModalOpen(true)}
+          filtros={filtros}
+          setFiltros={setFiltros}
         />
 
         {modalOpen && (
@@ -40,8 +60,8 @@ const SoportePage = () => {
         )}
 
         <div className="mt-8">
-          {vista === "tabla" && <TablaTickets tickets={tickets} />}
-          {vista === "kanban" && <KanbanVista tickets={tickets} />}
+          {vista === "tabla" && <TablaTickets tickets={ticketsFiltrados} />}
+          {vista === "kanban" && <KanbanVista tickets={ticketsFiltrados} />}
         </div>
       </div>
     </div>

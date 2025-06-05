@@ -10,6 +10,7 @@ const tickets = [
     severidad: 1,
     prioridad: "Media",
     custom: "sí",
+    producto: "PSA - Spring ERP",
   },
   {
     id: "ERP-000002",
@@ -22,6 +23,7 @@ const tickets = [
     severidad: 4,
     prioridad: "Media",
     custom: "no",
+    producto: "PSA - Spring ERP",
   },
   {
     id: "ERP-000003",
@@ -34,6 +36,7 @@ const tickets = [
     severidad: 1,
     prioridad: "Alta",
     custom: "sí",
+    producto: "PSA - Spring ERP",
   },
   {
     id: "ERP-000004",
@@ -46,6 +49,7 @@ const tickets = [
     severidad: 3,
     prioridad: "Baja",
     custom: "sí",
+    producto: "PSA - Spring ERP",
   },
   {
     id: "ERP-000005",
@@ -58,6 +62,7 @@ const tickets = [
     severidad: 5,
     prioridad: "Baja",
     custom: "no",
+    producto: "PSA - Spring ERP",
   },
 ];
 
