@@ -1,5 +1,3 @@
-import Estado from "@/components/Tickets/Estado";
-
 export default function TarjetaTicket({ ticket }) {
   return (
     <div className="bg-white rounded-md p-3 shadow-xl  text-sm space-y-1 mb-5">
