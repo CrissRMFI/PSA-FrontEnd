@@ -1,4 +1,5 @@
-import setUp from "@/app/setUp";
+import { productos } from "@/api/mock/productosDatos";
+import { opciones } from "@/api/mock/opcionesSelect";
 import { useState } from "react";
 import { addTicket } from "@/api/tickets";
 
@@ -8,47 +9,63 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
     prioridad: "",
     severidad: "",
     cliente: "",
-    modulo: "",
-    version: "1",
-    custom: false,
+    producto: "",
+    version: "",
     descripcion: "",
   });
 
   const [showError, setShowError] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, value } = e.target;
+
+    if (name === "producto") {
+      setForm((prev) => ({
+        ...prev,
+        producto: value,
+        version: "",
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const estanTodosCompletos = Object.entries(form).every(([key, value]) => {
-      if (typeof value === "boolean") return true;
-      return value.trim?.() !== "";
-    });
+    const estanTodosCompletos = Object.entries(form).every(
+      ([_, value]) => value?.trim?.() !== ""
+    );
 
     if (!estanTodosCompletos) {
       setShowError(true);
       setTimeout(() => setShowError(false), 2000);
       return;
     }
-    const nuevo = addTicket(form);
+
+    const nuevo = addTicket({
+      ...form,
+      custom: false,
+    });
+
     onCrearTicket(nuevo);
     onClose();
   };
 
+  const versionesDisponibles =
+    productos.find((p) => p.nombre === form.producto)?.versiones || [];
+
   return (
     <form className="space-y-4 text-sm">
       {showError && (
-        <div className="mb-4 bg-red-500 p-2 rounded-md flex justify-center items-center font-extrabold text-white ">
+        <div className="mb-4 bg-red-500 p-2 rounded-md text-white text-center font-semibold">
           Por favor, completá todos los campos.
         </div>
       )}
+
       <div>
         <label className="font-semibold block mb-1">Título:</label>
         <input
@@ -63,6 +80,41 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
 
       <div className="grid grid-cols-2 gap-6">
         <div>
+          <label className="font-semibold block mb-1">Producto:</label>
+          <select
+            name="producto"
+            className="border border-gray-300 rounded w-full px-2 py-1"
+            value={form.producto}
+            onChange={handleChange}
+          >
+            <option value="">Seleccionar producto</option>
+            {productos.map((p, i) => (
+              <option key={i} value={p.nombre}>
+                {p.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="font-semibold block mb-1">Versión:</label>
+          <select
+            name="version"
+            className="border border-gray-300 rounded w-full px-2 py-1"
+            value={form.version}
+            onChange={handleChange}
+            disabled={!form.producto}
+          >
+            <option value="">Seleccionar versión</option>
+            {versionesDisponibles.map((v, idx) => (
+              <option key={idx} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label className="font-semibold block mb-1">Prioridad:</label>
           <select
             name="prioridad"
@@ -70,9 +122,11 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             value={form.prioridad}
             onChange={handleChange}
           >
-            <option>Prioridad</option>
-            {setUp.prioridad.map((p, i) => (
-              <option key={i}>{p}</option>
+            <option value="">Prioridad</option>
+            {opciones.prioridad.map((p, i) => (
+              <option key={i} value={p}>
+                {p}
+              </option>
             ))}
           </select>
         </div>
@@ -85,9 +139,11 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             value={form.severidad}
             onChange={handleChange}
           >
-            <option>Severidad</option>
-            {setUp.severidad.map((s, i) => (
-              <option key={i}>{s}</option>
+            <option value="">Severidad</option>
+            {opciones.severidad.map((s, i) => (
+              <option key={i} value={s}>
+                {s}
+              </option>
             ))}
           </select>
         </div>
@@ -100,43 +156,10 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             value={form.cliente}
             onChange={handleChange}
           >
-            <option>Cliente</option>
-            <option>AgroTech</option>
-            <option>TextilSur</option>
+            <option value="">Cliente</option>
+            <option value="AgroTech">AgroTech</option>
+            <option value="TextilSur">TextilSur</option>
           </select>
-        </div>
-
-        <div>
-          <label className="font-semibold block mb-1">Módulo Func:</label>
-          <select
-            name="modulo"
-            className="border border-gray-300 rounded w-full px-2 py-1"
-            value={form.modulo}
-            onChange={handleChange}
-          >
-            <option>Módulo Funcional</option>
-            <option>Ventas</option>
-            <option>Stock</option>
-            <option>Contabilidad</option>
-          </select>
-        </div>
-
-        <div className="flex items-center mt-6 gap-3">
-          <label className="font-semibold">Customizado</label>
-          <input
-            type="checkbox"
-            name="custom"
-            checked={form.custom}
-            onChange={handleChange}
-          />
-          <label className="font-semibold ml-4">Versión</label>
-          <input
-            type="text"
-            name="version"
-            className="border border-gray-300 rounded px-2 py-1 w-20"
-            value={form.version}
-            onChange={handleChange}
-          />
         </div>
       </div>
 

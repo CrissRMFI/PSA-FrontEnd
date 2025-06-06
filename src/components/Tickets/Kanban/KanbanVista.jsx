@@ -1,17 +1,21 @@
 import ColumnaKanban from "./ColumnaKanban";
-
-const ESTADOS = ["Nuevo", "En Progreso", "Escalado", "Resuelto", "Cerrado"];
+import { opciones } from "@/api/mock/opcionesSelect";
 
 export default function KanbanVista({ tickets }) {
-  const ticketsPorEstado = ESTADOS.map((estado) => ({
+  const ticketsPorEstado = opciones.estado.map((estado) => ({
     estado,
     tickets: tickets.filter((t) => t.estado === estado),
   }));
 
   return (
-    <div className="flex gap-4 overflow-x-auto p-4 justify-evenly">
+    <div className="flex gap-4 overflow-x-auto p-4">
       {ticketsPorEstado.map(({ estado, tickets }) => (
-        <ColumnaKanban key={estado} estado={estado} tickets={tickets} />
+        <div
+          key={estado}
+          className="min-w-[280px] flex-shrink-0 bg-slate-50 rounded-lg shadow p-2"
+        >
+          <ColumnaKanban estado={estado} tickets={tickets} />
+        </div>
       ))}
     </div>
   );
