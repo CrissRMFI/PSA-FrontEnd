@@ -16,7 +16,7 @@ export default function TablaTickets({ tickets }) {
     <div className="overflow-x-auto rounded-lg shadow border border-gray-200 mt-6">
       <table className="min-w-full bg-white text-sm text-left">
         <thead className="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
-          <tr className="font-extrabold text-[14px]">
+          <tr className="font-extrabold text-[14px] text-center">
             {headers.map((col) => (
               <th key={col} className="px-4 py-3 whitespace-nowrap">
                 {col}

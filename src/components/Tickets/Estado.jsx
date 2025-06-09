@@ -7,5 +7,5 @@ export default function Estado({ estado }) {
       Escalado: "text-red-600",
     }[estado] || "text-gray-600";
 
-  return <span className={`font-bold ${color}`}>{estado}</span>;
+  return <span className={` font-bold ${color}`}>{estado}</span>;
 }

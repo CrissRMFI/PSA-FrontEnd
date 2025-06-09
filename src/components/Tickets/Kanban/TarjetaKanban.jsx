@@ -1,6 +1,6 @@
 export default function TarjetaTicket({ ticket }) {
   return (
-    <div className="bg-white rounded-md p-3 shadow-xl  text-sm space-y-1 mb-5">
+    <div className="bg-white rounded-md p-3 shadow-xl  text-sm space-y-1 mb-5 w-75">
       <div className="flex justify-between items-center font-medium text-lg">
         <span>{ticket.id}</span>
         <span className="bg-gray-100 px-2 py-0.5 rounded text-lg font-semibold">

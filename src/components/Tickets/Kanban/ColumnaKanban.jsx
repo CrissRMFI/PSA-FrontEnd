@@ -12,7 +12,7 @@ export default function ColumnaKanban({ estado, tickets }) {
   return (
     <div className="bg-slate-50 rounded-md shadow-sm border-none  min-w-[15%] px-5">
       <div className="p-3 border-b-slate-400 font-semibold text-sm uppercase flex justify-between items-center">
-        <span className={colores[estado] || "text-gray-600"}>{estado}</span>
+        <span className={colores[estado] || "text-gray-600" }>{estado}</span>
         <span className="text-gray-500">{tickets.length}</span>
       </div>
 

@@ -12,7 +12,7 @@ export default function KanbanVista({ tickets }) {
       {ticketsPorEstado.map(({ estado, tickets }) => (
         <div
           key={estado}
-          className="min-w-[280px] flex-shrink-0 bg-slate-50 rounded-lg shadow p-2"
+          className="min-w-[370px] flex-shrink-0 bg-slate-50 rounded-lg shadow p-2"
         >
           <ColumnaKanban estado={estado} tickets={tickets} />
         </div>

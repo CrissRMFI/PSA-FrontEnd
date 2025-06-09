@@ -16,7 +16,7 @@ export default function Filtros({ filtros, setFiltros }) {
         name="severidad"
         value={filtros.severidad}
         onChange={handleChange}
-        className="border border-gray-300 rounded px-2 py-1 text-md"
+        className="border border-gray-300 rounded px-2 py-1 text-md text-center"
       >
         <option value="">Severidad</option>
         {opciones.severidad.map((sev, idx) => (
@@ -30,7 +30,7 @@ export default function Filtros({ filtros, setFiltros }) {
         name="prioridad"
         value={filtros.prioridad}
         onChange={handleChange}
-        className="border border-gray-300 rounded px-2 py-1 text-md"
+        className="border border-gray-300 rounded px-2 py-1 text-md text-center"
       >
         <option value="">Prioridad</option>
         {opciones.prioridad.map((pr, idx) => (
@@ -44,7 +44,7 @@ export default function Filtros({ filtros, setFiltros }) {
         name="estado"
         value={filtros.estado}
         onChange={handleChange}
-        className="border border-gray-300 rounded px-2 py-1 text-md"
+        className="border border-gray-300 rounded px-2 py-1 text-md text-center"
       >
         <option value="">Estado</option>
         {opciones.estado.map((st, idx) => (
@@ -58,7 +58,7 @@ export default function Filtros({ filtros, setFiltros }) {
         name="sla"
         value={filtros.sla}
         onChange={handleChange}
-        className="border border-gray-300 rounded px-2 py-1 text-md"
+        className="border border-gray-300 rounded px-2 py-1 text-md text-center"
       >
         <option value="">% SLA</option>
         {opciones.sla.map((sl, idx) => (
