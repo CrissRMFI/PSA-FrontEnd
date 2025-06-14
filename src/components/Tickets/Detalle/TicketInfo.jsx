@@ -1,7 +1,7 @@
 export default function TicketInfo({ ticket }) {
   return (
-    <div className="border rounded-md p-4 shadow-sm bg-white space-y-2 text-sm">
-      <div className="grid grid-cols-2 gap-x-4 gap-y-2 font-medium">
+    <div className="p-4 shadow-2xl bg-white space-y-2 text-sm hover:shadow-sky-950 rounded-md h-full">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 font-semibold text-md">
         <span className="text-gray-600">Cliente:</span>
         <span>{ticket.cliente}</span>
 
