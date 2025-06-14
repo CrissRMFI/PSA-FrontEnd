@@ -11,7 +11,6 @@ export default function FilaTicket({ ticket }) {
       <td className="px-4 py-3 font-extrabold text-center">
         <Estado estado={ticket.estado} />
       </td>
-      <td className="px-4 py-3 text-center">{ticket.sla}</td>
       <td className="px-4 py-3 text-center">{ticket.severidad}</td>
       <td className="px-4 py-3 text-center">{ticket.prioridad}</td>
       <td className="px-4 py-3 text-center">

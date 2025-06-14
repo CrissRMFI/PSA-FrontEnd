@@ -6,7 +6,6 @@ export default function TablaTickets({ tickets }) {
     "Nombre",
     "Cliente",
     "Estado",
-    "SLA",
     "Severidad",
     "Prioridad",
     "Ver",
