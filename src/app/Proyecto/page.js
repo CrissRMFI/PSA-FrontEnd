@@ -1,11 +1,8 @@
 import React from "react";
+import ProyectoDashboard from "./components/ProyectoDashboard";
 
 const ProyectoPage = () => {
-  return (
-    <div className="w-full h-screen flex justify-center align-middle items-center text-8xl">
-      Acá el contenido del Aquad 1
-    </div>
-  );
+  return <ProyectoDashboard />;
 };
 
 export default ProyectoPage;
