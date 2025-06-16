@@ -1,25 +1,17 @@
-import { tickets } from "@/api/mock/ticketsDatos";
-let idCounter = tickets.length + 1;
+const BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/ticket`;
 
-export const getTickets = () => [...tickets];
-
-export const addTicket = (ticket) => {
-  const nuevo = {
-    estado: "Nuevo",
-    nombre: ticket.nombre,
-    prioridad: ticket.prioridad,
-    severidad: ticket.severidad,
-    cliente: ticket.cliente,
-    version: ticket.version || "1",
-    descripcion: ticket.descripcion,
-    sla: ticket.sla || "7 días - 100%",
-    producto: ticket.producto,
-  };
-
-  nuevo.id = generarId();
-
-  tickets.push(nuevo);
-  return nuevo;
+export const getTickets = async () => {
+  const res = await fetch(BASE_URL);
+  if (!res.ok) throw new Error("Error al obtener tickets");
+  return await res.json();
 };
 
-const generarId = () => `ERP-00000${idCounter++}`;
+export const addTicket = async (ticket) => {
+  const res = await fetch(BASE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(ticket),
+  });
+  if (!res.ok) throw new Error("Error al agregar ticket");
+  return await res.json();
+};

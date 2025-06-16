@@ -25,7 +25,12 @@ export default function SoportePage() {
   });
 
   useEffect(() => {
-    setTickets(getTickets());
+    const fetchTickets = async () => {
+      const data = await getTickets();
+      setTickets(data);
+    };
+
+    fetchTickets();
   }, []);
 
   const ticketsFiltrados = tickets.filter((ticket) => {
