@@ -501,13 +501,51 @@ export default function TareasManagerAvanzado({ proyectoId, faseIdSeleccionada =
     setFiltros(prev => ({ ...prev, [campo]: valor }));
   };
 
-  const handleNuevaTarea = () => {
-    alert('Función Nueva Tarea - Por implementar');
-  };
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+const [tareaEditando, setTareaEditando] = useState(null);
 
-  const handleEditarTarea = (tarea) => {
-    alert(`Editar tarea: ${tarea.nombre}`);
-  };
+const handleNuevaTarea = (faseId = null) => {
+  setTareaEditando(null);
+  if (faseId) {
+    setFiltros(prev => ({ ...prev, fase: faseId }));
+  }
+  setMostrarFormulario(true);
+};
+
+const handleEditarTarea = (tarea) => {
+  setTareaEditando(tarea);
+  setMostrarFormulario(true);
+};
+
+const handleGuardarTarea = (tareaData) => {
+  if (tareaEditando) {
+    // Actualizar tarea existente
+    setTareas(prev => prev.map(t => 
+      t.id === tareaEditando.id ? { ...tareaData, id: tareaEditando.id } : t
+    ));
+  } else {
+    // Crear nueva tarea
+    setTareas(prev => [...prev, tareaData]);
+  }
+  setMostrarFormulario(false);
+  setTareaEditando(null);
+};
+
+// Y al final del componente, antes del cierre, agrega:
+
+{/* Modal Formulario */}
+{mostrarFormulario && (
+  <TareaAvanzadaForm 
+    tarea={tareaEditando}
+    fases={fases}
+    recursos={recursos}
+    onGuardar={handleGuardarTarea}
+    onCancelar={() => {
+      setMostrarFormulario(false);
+      setTareaEditando(null);
+    }}
+  />
+)}
 
   const handleEliminarTarea = (tarea) => {
     if (confirm(`¿Eliminar "${tarea.nombre}"?`)) {
