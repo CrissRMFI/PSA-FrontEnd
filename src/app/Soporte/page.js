@@ -8,11 +8,12 @@ import TablaTickets from "@/components/Tickets/Tabla/TablaTickets";
 import ModalNuevoTicket from "@/components/Tickets/ModalNuevoTicket/ModalNuevoTicket";
 import { getTickets } from "@/api/tickets";
 import Filtros from "@/components/Filtros/Filtros";
+import useTickets from "@/hooks/useTickets";
 
 export default function SoportePage() {
+  const { tickets, setTickets, loading } = useTickets();
   const [vista, setVista] = useState("tabla");
   const [modalOpen, setModalOpen] = useState(false);
-  const [tickets, setTickets] = useState([]);
 
   const [productoSeleccionado, setProductoSeleccionado] = useState("");
   const [versionSeleccionada, setVersionSeleccionada] = useState("");
@@ -47,6 +48,8 @@ export default function SoportePage() {
   return (
     <div className="p-10">
       <h2 className="text-4xl text-slate-500 mb-10">Soporte / Productos</h2>
+
+      {loading && <p className="text-slate-400">Cargando tickets...</p>}
 
       <SeleccionadorProducto
         onSeleccionarProducto={(prod) => {
