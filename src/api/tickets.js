@@ -29,3 +29,11 @@ export const getMetadatos = async () => {
   if (!res.ok) throw new Error("Error al obtener metadatos del ticket");
   return await res.json();
 };
+
+export const getTicketById = async (id) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/ticket/${id}`
+  );
+  if (!res.ok) throw new Error("Error al obtener el ticket");
+  return res.json();
+};

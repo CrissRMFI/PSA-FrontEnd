@@ -1,21 +1,53 @@
 "use client";
-import { getTickets } from "@/api/tickets";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { getTicketById } from "@/api/tickets";
+
 import TicketDescripcion from "@/components/Tickets/Detalle/TicketDescripcion";
 import TicketHeader from "@/components/Tickets/Detalle/TicketHeader";
 import TicketInfo from "@/components/Tickets/Detalle/TicketInfo";
 import TicketTareas from "@/components/Tickets/Detalle/TicketTareas";
-import { useParams } from "next/navigation";
+import { getProductos } from "@/api/productos";
 
 const VistaTicket = () => {
   const { id } = useParams();
+  const [ticket, setTicket] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [producto, setProducto] = useState("");
 
-  const tickets = getTickets();
-  const ticket = tickets.find((t) => t.id === id);
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchTicket = async () => {
+      try {
+        const data = await getTicketById(id);
+        setTicket(data);
+        const productoNombre = await getProductos();
+        const productoFiltrado = productoNombre.find(
+          (p) => p.id === data.idProducto
+        );
+        setProducto(productoFiltrado ? productoFiltrado.nombre : "Desconocido");
+      } catch (error) {
+        console.error("Error al obtener el ticket:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTicket();
+  }, [id]);
+
+  if (loading) return <p className="p-10 text-slate-400">Cargando ticket...</p>;
+  if (!ticket) return <p className="p-10 text-red-500">Ticket no encontrado</p>;
+
+  console.log(ticket);
+
   return (
     <div className="p-10">
-      <h2 className="text-4xl text-slate-500">{`Soporte / Producto / ${ticket.producto}`}</h2>
+      <h2 className="text-4xl text-slate-500">{`Soporte / Producto / ${producto}`}</h2>
       <div className="w-[90%] mx-auto space-y-8">
-        <TicketHeader id={id} nombre={ticket.nombre} />
+        <TicketHeader id={ticket.codigo} nombre={ticket.nombre} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <TicketInfo ticket={ticket} />

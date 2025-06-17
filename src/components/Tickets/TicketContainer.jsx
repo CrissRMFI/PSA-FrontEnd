@@ -8,6 +8,7 @@ import TablaTickets from "@/components/Tickets/Tabla/TablaTickets";
 import KanbanVista from "@/components/Tickets/Kanban/KanbanVista";
 import VistaSelector from "./VistaSelector";
 import { getClientes, getResponsables } from "@/api/serviciosExternos";
+import { mapearTicketsConDatos } from "@/utils/mapTicketData";
 
 export default function TicketContainer({ producto, version }) {
   const { tickets, setTickets, loading } = useTickets(producto, version);
@@ -47,41 +48,11 @@ export default function TicketContainer({ producto, version }) {
     fetchClientesYResponsables();
   }, []);
 
-  const obtenerNombreCliente = (id) => {
-    const cliente = clientes.find((c) => c.id === id);
-    return cliente ? cliente["razon_social"] : "Desconocido";
-  };
-
-  const obtenerNombreResponsable = (id) => {
-    const responsable = responsables.find((r) => r.id === id);
-    return responsable
-      ? `${responsable.nombre} ${responsable.apellido}`
-      : "Desconocido";
-  };
-
-  const obtenerLabelPrioridad = (code) => {
-    const p = PRIORIDADES.find((p) => p.code === code);
-    return p ? p.label : code;
-  };
-
-  const obtenerLabelSeveridad = (code) => {
-    const s = SEVERIDADES.find((s) => s.code === code);
-    return s ? s.label : code;
-  };
-
-  const obtenerLabelEstado = (code) => {
-    const estado = ESTADOS.find((e) => e.code === code);
-    return estado ? estado.label : code;
-  };
-
-  const ticketsConNombres = ticketsFiltrados.map((ticket) => ({
-    ...ticket,
-    nombreCliente: obtenerNombreCliente(ticket.idCliente),
-    nombreResponsable: obtenerNombreResponsable(ticket.idResponsable),
-    prioridadLabel: obtenerLabelPrioridad(ticket.prioridad),
-    severidadLabel: obtenerLabelSeveridad(ticket.severidad),
-    estadoLabel: obtenerLabelEstado(ticket.estado),
-  }));
+  const ticketsConNombres = mapearTicketsConDatos(
+    ticketsFiltrados,
+    clientes,
+    responsables
+  );
 
   return (
     <>
