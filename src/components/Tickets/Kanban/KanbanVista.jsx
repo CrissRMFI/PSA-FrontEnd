@@ -3,7 +3,6 @@ import { useState, useEffect, use } from "react";
 import { getMetadatos } from "@/api/tickets";
 
 export default function KanbanVista({ tickets }) {
-  console.log(tickets);
   const [metadatos, setMetadatos] = useState({
     estados: [],
     prioridades: [],

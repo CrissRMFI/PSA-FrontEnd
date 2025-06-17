@@ -1,4 +1,5 @@
 import TarjetaKanban from "@/components/Tickets/Kanban/TarjetaKanban";
+import Link from "next/link";
 
 export default function ColumnaKanban({ estado, tickets }) {
   const colores = {
@@ -20,7 +21,9 @@ export default function ColumnaKanban({ estado, tickets }) {
 
       <div className="p-2 space-y-3 w-full">
         {tickets.map((t) => (
-          <TarjetaKanban key={t.id} ticket={t} />
+          <Link href={`/Soporte/${t.internalId}`} key={t.internalId}>
+            <TarjetaKanban key={t.id} ticket={t} />
+          </Link>
         ))}
       </div>
     </div>

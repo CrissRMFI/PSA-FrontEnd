@@ -1,5 +1,4 @@
 export default function TarjetaTicket({ ticket }) {
-  console.log(ticket);
   return (
     <div className="bg-white rounded-md p-3 shadow-xl  text-sm space-y-1 mb-5 w-75">
       <div className="flex justify-between items-center font-medium text-lg">
