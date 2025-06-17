@@ -24,8 +24,10 @@ export function mapearEstado(code) {
   const map = {
     CREATED: "Creado",
     IN_PROGRESS: "En progreso",
-    ESCALATED: "Escalado",
-    CLOSED: "Cerrado",
+    WAITING_FOR_VALIDATION: "En espera de información",
+    BLOCKED: "Bloqueado",
+    FINISHED: "Finalizado",
+    CANCEL: "Cancelado",
   };
   return map[code] || code;
 }

@@ -41,13 +41,11 @@ const VistaTicket = () => {
   if (loading) return <p className="p-10 text-slate-400">Cargando ticket...</p>;
   if (!ticket) return <p className="p-10 text-red-500">Ticket no encontrado</p>;
 
-  console.log(ticket);
-
   return (
     <div className="p-10">
       <h2 className="text-4xl text-slate-500">{`Soporte / Producto / ${producto}`}</h2>
       <div className="w-[90%] mx-auto space-y-8">
-        <TicketHeader id={ticket.codigo} nombre={ticket.nombre} />
+        <TicketHeader ticket={ticket} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <TicketInfo ticket={ticket} />

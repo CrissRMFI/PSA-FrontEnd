@@ -37,3 +37,19 @@ export const getTicketById = async (id) => {
   if (!res.ok) throw new Error("Error al obtener el ticket");
   return res.json();
 };
+
+export const updateTicket = async (internalId, data) => {
+  console.log(internalId, data);
+  const res = await fetch(`${BASE_URL}/${internalId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error("Error al actualizar ticket: " + errorText);
+  }
+
+  return "Ticket actualizado correctamente";
+};

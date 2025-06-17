@@ -13,9 +13,11 @@ export const SEVERIDADES = [
 ];
 
 export const ESTADOS = [
-  { code: "CREATED", label: "Nuevo" },
-  { code: "ASSIGNED", label: "Asignado" },
+  { code: "CREATED", label: "Creado" },
   { code: "IN_PROGRESS", label: "En Progreso" },
+  { code: "WAITING_FOR_VALIDATION", label: "En Espera de Información" },
+  { code: "FINISHED", label: "Finalizado" },
+  { code: "CANCEL", label: "Cancelado" },
+  { code: "REJECTED", label: "Rechazado" },
   { code: "BLOCKED", label: "Bloqueado" },
-  { code: "CLOSED", label: "Cerrado" },
 ];
