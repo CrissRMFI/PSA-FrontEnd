@@ -27,6 +27,7 @@ export default function SoportePage() {
   useEffect(() => {
     const fetchTickets = async () => {
       const data = await getTickets();
+      console.log("Tickets obtenidos:", data);
       setTickets(data);
     };
 
@@ -34,14 +35,12 @@ export default function SoportePage() {
   }, []);
 
   const ticketsFiltrados = tickets.filter((ticket) => {
-    console.log(ticket);
     return (
-      ticket.producto === productoSeleccionado &&
+      ticket.idProducto === productoSeleccionado &&
       ticket.version === versionSeleccionada &&
-      (filtros.severidad === "" || ticket.severidad == filtros.severidad) &&
+      (filtros.severidad === "" || ticket.severidad === filtros.severidad) &&
       (filtros.prioridad === "" || ticket.prioridad === filtros.prioridad) &&
-      (filtros.estado === "" || ticket.estado === filtros.estado) &&
-      (filtros.sla === "" || ticket.sla === filtros.sla)
+      (filtros.estado === "" || ticket.estado === filtros.estado)
     );
   });
 

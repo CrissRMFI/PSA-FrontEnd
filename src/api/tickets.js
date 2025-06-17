@@ -7,14 +7,18 @@ export const getTickets = async () => {
 };
 
 export const addTicket = async (ticket) => {
-  console.log(ticket);
   const res = await fetch(BASE_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(ticket),
   });
-  if (!res.ok) throw new Error("Error al agregar ticket");
-  return await res.json();
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error("Error al agregar ticket: " + errorText);
+  }
+
+  return await res.text();
 };
 
 const BASE_METADATOS = `${process.env.NEXT_PUBLIC_SERVICIOS_METADATOS}`;
