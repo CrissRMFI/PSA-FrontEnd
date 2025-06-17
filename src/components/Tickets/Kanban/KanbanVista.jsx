@@ -1,5 +1,4 @@
 import ColumnaKanban from "./ColumnaKanban";
-import { opciones } from "@/api/mock/opcionesSelect";
 import { useState, useEffect, use } from "react";
 import { getMetadatos } from "@/api/tickets";
 

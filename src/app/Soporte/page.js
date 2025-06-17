@@ -22,7 +22,6 @@ export default function SoportePage() {
     severidad: "",
     prioridad: "",
     estado: "",
-    sla: "",
   });
 
   useEffect(() => {
@@ -35,6 +34,7 @@ export default function SoportePage() {
   }, []);
 
   const ticketsFiltrados = tickets.filter((ticket) => {
+    console.log(ticket);
     return (
       ticket.producto === productoSeleccionado &&
       ticket.version === versionSeleccionada &&
@@ -59,11 +59,13 @@ export default function SoportePage() {
         productoSeleccionado={productoSeleccionado}
       />
 
-      <SeleccionadorVersion
-        producto={productoSeleccionado}
-        versionSeleccionada={versionSeleccionada}
-        onSeleccionarVersion={setVersionSeleccionada}
-      />
+      {productoSeleccionado && (
+        <SeleccionadorVersion
+          producto={productoSeleccionado}
+          versionSeleccionada={versionSeleccionada}
+          onSeleccionarVersion={setVersionSeleccionada}
+        />
+      )}
 
       {productoSeleccionado && versionSeleccionada && (
         <>

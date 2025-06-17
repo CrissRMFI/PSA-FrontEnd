@@ -1,5 +1,5 @@
 "use client";
-import { productos } from "@/api/mock/productosDatos";
+import { getProductos } from "@/api/productos";
 import { useState } from "react";
 import { getClientes, getResponsables } from "@/api/serviciosExternos";
 import { useEffect } from "react";
@@ -27,6 +27,7 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
   const [showError, setShowError] = useState(false);
   const [prioridadesMeta, setPrioridadesMeta] = useState([]);
   const [severidadesMeta, setSeveridadesMeta] = useState([]);
+  const [productos, setProductos] = useState([]);
 
   useEffect(() => {
     getClientes().then(setClientes).catch(console.error);
@@ -35,6 +36,11 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
       .then((data) => {
         setPrioridadesMeta(data.prioridades);
         setSeveridadesMeta(data.severidades);
+      })
+      .catch(console.error);
+    getProductos()
+      .then((data) => {
+        setProductos(data);
       })
       .catch(console.error);
   }, []);

@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { productos } from "@/api/mock/productosDatos";
+import { useState, useEffect } from "react";
+import { getProductos } from "@/api/productos";
 
 export default function SeleccionadorProducto({
   productoSeleccionado,
   onSeleccionarProducto,
 }) {
   const [busqueda, setBusqueda] = useState("");
+  const [productos, setProductos] = useState([]);
 
   const productosFiltrados = productos.filter((p) =>
     p.nombre.toLowerCase().includes(busqueda.toLowerCase())
@@ -17,11 +18,20 @@ export default function SeleccionadorProducto({
 
   const manejarSeleccion = (nombre) => {
     if (productoSeleccionado === nombre) {
-      onSeleccionarProducto(""); 
+      onSeleccionarProducto("");
     } else {
-      onSeleccionarProducto(nombre); 
+      onSeleccionarProducto(nombre);
     }
   };
+
+  useEffect(() => {
+    const getProductosAPI = async () => {
+      const productos = await getProductos();
+      setProductos(productos);
+    };
+
+    getProductosAPI();
+  }, []);
 
   return (
     <div className="mb-6 p-4">
@@ -50,7 +60,11 @@ export default function SeleccionadorProducto({
               key={nombre}
               onClick={() => manejarSeleccion(nombre)}
               className={`cursor-pointer border rounded-lg shadow-md transition-all duration-300
-              ${seleccionado ? "border-blue-600 bg-blue-50" : "hover:shadow-xl hover:border-blue-400"}
+              ${
+                seleccionado
+                  ? "border-blue-600 bg-blue-50"
+                  : "hover:shadow-xl hover:border-blue-400"
+              }
               flex items-center justify-center
               w-[220px] h-[180px] p-4
             `}

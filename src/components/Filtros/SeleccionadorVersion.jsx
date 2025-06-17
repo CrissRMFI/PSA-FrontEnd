@@ -1,4 +1,5 @@
-import { productos } from "@/api/mock/productosDatos";
+import { getProductos } from "@/api/productos";
+import { useEffect, useState } from "react";
 
 export default function SeleccionadorVersion({
   producto,
@@ -6,6 +7,21 @@ export default function SeleccionadorVersion({
   onSeleccionarVersion,
 }) {
   if (!producto) return null;
+
+  const [productos, setProductos] = useState([]);
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const data = await getProductos();
+        setProductos(data);
+      } catch (error) {
+        console.error("Error al obtener productos:", error);
+      }
+    };
+
+    fetchProductos();
+  }, []);
 
   const prod = productos.find((p) => p.nombre === producto);
 
