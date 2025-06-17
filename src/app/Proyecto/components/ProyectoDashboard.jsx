@@ -1,66 +1,8 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Plus, Filter, TrendingUp, Users, Clock, AlertCircle, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-
-// Mock data - después esto viene del backend
-const mockProyectos = [
-  {
-    idProyecto: 1,
-    nombre: "Implementación SAP ERP",
-    descripcion: "Migración completa a SAP ERP 7.51",
-    estado: "ACTIVO",
-    liderProyecto: "Leonardo Felici",
-    cliente: { nombre: "Empresa ABC S.A." },
-    fechaInicio: "2024-01-15",
-    fechaFinEstimada: "2024-06-30",
-    porcentajeAvance: 65,
-    totalTareas: 24,
-    tareasCompletadas: 16,
-    riesgosActivos: 2,
-    productos: ["SAP ERP 7.51"]
-  },
-  {
-    idProyecto: 2,
-    nombre: "Migración Oracle Cloud",
-    descripcion: "Actualización a Oracle ERP Cloud 23C",
-    estado: "ACTIVO", 
-    liderProyecto: "María González",
-    cliente: { nombre: "TechCorp Ltd." },
-    fechaInicio: "2024-02-01",
-    fechaFinEstimada: "2024-08-15",
-    porcentajeAvance: 30,
-    totalTareas: 18,
-    tareasCompletadas: 5,
-    riesgosActivos: 1,
-    productos: ["Oracle ERP Cloud 23C"]
-  },
-  {
-    idProyecto: 3,
-    nombre: "Deploy Salesforce CRM",
-    descripcion: "Implementación Salesforce 2025 Spring Release",
-    estado: "PAUSADO",
-    liderProyecto: "Carlos Mendoza", 
-    cliente: { nombre: "InnovateCorp" },
-    fechaInicio: "2024-03-01",
-    fechaFinEstimada: "2024-07-30",
-    porcentajeAvance: 45,
-    totalTareas: 15,
-    tareasCompletadas: 7,
-    riesgosActivos: 3,
-    productos: ["Salesforce CRM 2025 Spring Release"]
-  }
-];
-
-const mockEstadisticas = {
-  totalProyectos: 15,
-  proyectosActivos: 12,
-  proyectosPausados: 2, 
-  proyectosCerrados: 1,
-  porcentajeAvancePromedio: 47,
-  riesgosActivos: 8,
-  tareasVencidas: 5
-};
+import { useProyectos } from '../../../api/hooks'; // ✅ Usar hooks reales
 
 function ProyectoCard({ proyecto, onVerDetalle, onEditarProyecto, onGestionarTareas }) {
   const getEstadoColor = (estado) => {
@@ -78,6 +20,35 @@ function ProyectoCard({ proyecto, onVerDetalle, onEditarProyecto, onGestionarTar
     return 'text-red-600';
   };
 
+  // ✅ Calcular progreso basado en datos reales
+  const porcentajeAvance = useMemo(() => {
+    if (!proyecto.fases || proyecto.fases.length === 0) return 0;
+    
+    const promedioFases = proyecto.fases.reduce((total, fase) => {
+      // Si la fase tiene método de cálculo, usarlo; sino usar estado descriptivo
+      if (fase.estadoDescriptivo === 'Completada') return total + 100;
+      if (fase.estadoDescriptivo === 'En Progreso') return total + 50;
+      return total + 0; // Pendiente
+    }, 0) / proyecto.fases.length;
+    
+    return Math.round(promedioFases);
+  }, [proyecto.fases]);
+
+  // ✅ Contar tareas totales desde las fases
+  const totalTareas = useMemo(() => {
+    return proyecto.totalTareas || 0;
+  }, [proyecto.totalTareas]);
+
+  // ✅ Calcular tareas completadas (estimación basada en progreso)
+  const tareasCompletadas = useMemo(() => {
+    return Math.round(totalTareas * (porcentajeAvance / 100));
+  }, [totalTareas, porcentajeAvance]);
+
+  // ✅ Contar riesgos activos
+  const riesgosActivos = useMemo(() => {
+    return proyecto.riesgosActivos || (proyecto.riesgos?.filter(r => r.estado === 'ACTIVO').length || 0);
+  }, [proyecto.riesgosActivos, proyecto.riesgos]);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500">
       <div className="flex justify-between items-start mb-4">
@@ -86,7 +57,7 @@ function ProyectoCard({ proyecto, onVerDetalle, onEditarProyecto, onGestionarTar
               onClick={() => onVerDetalle(proyecto.idProyecto)}>
             {proyecto.nombre}
           </h3>
-          <p className="text-sm text-gray-600 mb-2">{proyecto.descripcion}</p>
+          <p className="text-sm text-gray-600 mb-2">{proyecto.descripcion || 'Sin descripción'}</p>
           <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getEstadoColor(proyecto.estado)}`}>
             {proyecto.estado}
           </span>
@@ -137,57 +108,67 @@ function ProyectoCard({ proyecto, onVerDetalle, onEditarProyecto, onGestionarTar
         <div className="flex items-center text-sm text-gray-600">
           <Users className="w-4 h-4 mr-2" />
           <span className="font-medium">Líder:</span>
-          <span className="ml-1">{proyecto.liderProyecto}</span>
+          <span className="ml-1">{proyecto.liderProyecto || 'Sin asignar'}</span>
         </div>
 
-        <div className="flex items-center text-sm text-gray-600">
-          <span className="font-medium">Cliente:</span>
-          <span className="ml-1">{proyecto.cliente.nombre}</span>
-        </div>
+        {/* ✅ Fechas reales de la base de datos */}
+        {proyecto.fechaFinEstimada && (
+          <div className="flex items-center text-sm text-gray-600">
+            <Clock className="w-4 h-4 mr-2" />
+            <span>Fin estimado: {new Date(proyecto.fechaFinEstimada).toLocaleDateString('es-ES')}</span>
+          </div>
+        )}
 
-        <div className="flex items-center text-sm text-gray-600">
-          <Clock className="w-4 h-4 mr-2" />
-          <span>{new Date(proyecto.fechaFinEstimada).toLocaleDateString('es-ES')}</span>
-        </div>
+        {proyecto.fechaInicio && (
+          <div className="flex items-center text-sm text-gray-600">
+            <span>Inicio: {new Date(proyecto.fechaInicio).toLocaleDateString('es-ES')}</span>
+          </div>
+        )}
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Progreso</span>
-            <span className="font-medium">{proyecto.porcentajeAvance}%</span>
+            <span className="font-medium">{porcentajeAvance}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${proyecto.porcentajeAvance}%` }}
+              style={{ width: `${porcentajeAvance}%` }}
             />
           </div>
         </div>
 
         <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
           <div className="flex items-center">
-            <span className="text-gray-600">Tareas:</span>
-            <span className="ml-1 font-medium">{proyecto.tareasCompletadas}/{proyecto.totalTareas}</span>
+            <span className="text-gray-600">Fases:</span>
+            <span className="ml-1 font-medium">{proyecto.fases?.length || 0}</span>
           </div>
           <div className="flex items-center">
-            <AlertCircle className={`w-4 h-4 mr-1 ${getRiesgoColor(proyecto.riesgosActivos)}`} />
-            <span className={`font-medium ${getRiesgoColor(proyecto.riesgosActivos)}`}>
-              {proyecto.riesgosActivos} riesgos
+            <AlertCircle className={`w-4 h-4 mr-1 ${getRiesgoColor(riesgosActivos)}`} />
+            <span className={`font-medium ${getRiesgoColor(riesgosActivos)}`}>
+              {riesgosActivos} riesgos
             </span>
           </div>
         </div>
       </div>
 
+      {/* ✅ Mostrar fases en lugar de productos */}
       <div className="mt-4 pt-4 border-t border-gray-100">
         <div className="flex justify-between items-center">
           <div className="flex flex-wrap gap-1">
-            {proyecto.productos.slice(0, 2).map((producto, index) => (
+            {proyecto.fases?.slice(0, 2).map((fase, index) => (
               <span key={index} className="inline-flex px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded">
-                {producto}
+                {fase.nombre}
               </span>
             ))}
-            {proyecto.productos.length > 2 && (
+            {proyecto.fases?.length > 2 && (
               <span className="inline-flex px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded">
-                +{proyecto.productos.length - 2}
+                +{proyecto.fases.length - 2} fases
+              </span>
+            )}
+            {(!proyecto.fases || proyecto.fases.length === 0) && (
+              <span className="inline-flex px-2 py-1 text-xs bg-gray-50 text-gray-500 rounded">
+                Sin fases
               </span>
             )}
           </div>
@@ -231,38 +212,59 @@ function EstadisticaCard({ titulo, valor, icono: Icon, color = "blue", descripci
 
 export default function ProyectoDashboard() {
   const router = useRouter();
-  const [proyectos, setProyectos] = useState([]);
-  const [estadisticas, setEstadisticas] = useState(null);
+  
+  // ✅ Usar hook real en lugar de mock data
+  const { proyectos, loading, error, cargarProyectos } = useProyectos();
+  
   const [filtros, setFiltros] = useState({
     busqueda: '',
     estado: '',
     lider: ''
   });
-  const [loading, setLoading] = useState(true);
 
-  // Simular carga de datos
-  useEffect(() => {
-    const cargarDatos = async () => {
-      setLoading(true);
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setProyectos(mockProyectos);
-      setEstadisticas(mockEstadisticas);
-      setLoading(false);
-    };
+  // ✅ Calcular estadísticas reales desde los datos de la API
+  const estadisticas = useMemo(() => {
+    if (!proyectos.length) return null;
     
-    cargarDatos();
-  }, []);
+    const proyectosActivos = proyectos.filter(p => p.estado === 'ACTIVO').length;
+    const proyectosPausados = proyectos.filter(p => p.estado === 'PAUSADO').length;
+    const proyectosCerrados = proyectos.filter(p => p.estado === 'CERRADO').length;
+    
+    // Calcular progreso promedio
+    const totalFases = proyectos.reduce((total, p) => total + (p.fases?.length || 0), 0);
+    const fasesCompletadas = proyectos.reduce((total, p) => {
+      return total + (p.fases?.filter(f => f.estadoDescriptivo === 'Completada').length || 0);
+    }, 0);
+    const porcentajeAvancePromedio = totalFases > 0 ? Math.round((fasesCompletadas / totalFases) * 100) : 0;
+    
+    // Contar riesgos activos
+    const totalRiesgosActivos = proyectos.reduce((total, p) => {
+      return total + (p.riesgosActivos || (p.riesgos?.filter(r => r.estado === 'ACTIVO').length || 0));
+    }, 0);
+
+    return {
+      totalProyectos: proyectos.length,
+      proyectosActivos,
+      proyectosPausados,
+      proyectosCerrados,
+      porcentajeAvancePromedio,
+      riesgosActivos: totalRiesgosActivos,
+      totalFases
+    };
+  }, [proyectos]);
 
   // Filtrar proyectos
-  const proyectosFiltrados = proyectos.filter(proyecto => {
-    const cumpleBusqueda = proyecto.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
-                          proyecto.cliente.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase());
-    const cumpleEstado = !filtros.estado || proyecto.estado === filtros.estado;
-    const cumpleLider = !filtros.lider || proyecto.liderProyecto.toLowerCase().includes(filtros.lider.toLowerCase());
-    
-    return cumpleBusqueda && cumpleEstado && cumpleLider;
-  });
+  const proyectosFiltrados = useMemo(() => {
+    return proyectos.filter(proyecto => {
+      const cumpleBusqueda = proyecto.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+                            (proyecto.descripcion && proyecto.descripcion.toLowerCase().includes(filtros.busqueda.toLowerCase())) ||
+                            (proyecto.liderProyecto && proyecto.liderProyecto.toLowerCase().includes(filtros.busqueda.toLowerCase()));
+      const cumpleEstado = !filtros.estado || proyecto.estado === filtros.estado;
+      const cumpleLider = !filtros.lider || (proyecto.liderProyecto && proyecto.liderProyecto.toLowerCase().includes(filtros.lider.toLowerCase()));
+      
+      return cumpleBusqueda && cumpleEstado && cumpleLider;
+    });
+  }, [proyectos, filtros]);
 
   const handleFiltroChange = (campo, valor) => {
     setFiltros(prev => ({
@@ -288,12 +290,33 @@ export default function ProyectoDashboard() {
     router.push(`/Proyecto/${proyecto.idProyecto}/tareas`);
   };
 
+  // ✅ Manejo de errores
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 mb-4">
+            <AlertCircle className="w-16 h-16 mx-auto" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error al cargar proyectos</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={cargarProyectos}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando proyectos...</p>
+          <p className="text-gray-600">Cargando proyectos desde la base de datos...</p>
         </div>
       </div>
     );
@@ -341,6 +364,7 @@ export default function ProyectoDashboard() {
               valor={`${estadisticas.porcentajeAvancePromedio}%`}
               icono={TrendingUp}
               color="blue"
+              descripcion="Basado en fases completadas"
             />
             <EstadisticaCard 
               titulo="Riesgos Activos" 
@@ -359,7 +383,7 @@ export default function ProyectoDashboard() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Buscar proyectos o clientes..."
+                  placeholder="Buscar proyectos, descripción o líder..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   value={filtros.busqueda}
                   onChange={(e) => handleFiltroChange('busqueda', e.target.value)}
@@ -385,8 +409,7 @@ export default function ProyectoDashboard() {
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 value={filtros.lider}
                 onChange={(e) => handleFiltroChange('lider', e.target.value)}
-              >
-              </input>
+              />
             </div>
           </div>
         </div>
@@ -408,8 +431,26 @@ export default function ProyectoDashboard() {
               <div className="text-gray-400 mb-4">
                 <Search className="w-16 h-16 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron proyectos</h3>
-              <p className="text-gray-600">Intenta ajustar los filtros o crear un nuevo proyecto</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {filtros.busqueda || filtros.estado || filtros.lider 
+                  ? 'No se encontraron proyectos con esos filtros'
+                  : 'No hay proyectos aún'
+                }
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {filtros.busqueda || filtros.estado || filtros.lider
+                  ? 'Intenta ajustar los filtros para ver más resultados'
+                  : 'Crea tu primer proyecto para comenzar'
+                }
+              </p>
+              {(!filtros.busqueda && !filtros.estado && !filtros.lider) && (
+                <button 
+                  onClick={handleNuevoProyecto}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Crear primer proyecto
+                </button>
+              )}
             </div>
           )}
         </div>

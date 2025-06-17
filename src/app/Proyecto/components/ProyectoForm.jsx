@@ -1,24 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Calendar, User, Building2, Package, Save, X, Plus } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Building2, Package, Save, X, Plus, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useProyectos } from '../../../api/hooks';
 
-// Mock data - después esto viene de las APIs
-const mockClientes = [
-  { id: 1, nombre: "Empresa ABC S.A.", email: "contacto@empresaabc.com" },
-  { id: 2, nombre: "TechCorp Ltd.", email: "info@techcorp.com" },
-  { id: 3, nombre: "InnovateCorp", email: "hello@innovatecorp.com" },
-  { id: 4, nombre: "Global Solutions", email: "contact@globalsolutions.com" }
-];
-
-const mockRecursos = [
-  { id: 1, nombre: "Leonardo", apellido: "Felici", legajo: "EMP001" },
-  { id: 2, nombre: "María", apellido: "González", legajo: "EMP002" },
-  { id: 3, nombre: "Carlos", apellido: "Mendoza", legajo: "EMP003" },
-  { id: 4, nombre: "Ana", apellido: "Rodríguez", legajo: "EMP004" },
-  { id: 5, nombre: "Pedro", apellido: "López", legajo: "EMP005" }
-];
-
-// Productos del CSV
+// Productos del CSV - estos se podrían mover a una API después
 const mockProductos = [
   { nombre: "SAP ERP", versiones: ["7.50", "7.51"] },
   { nombre: "Oracle ERP Cloud", versiones: ["23C"] },
@@ -32,10 +18,14 @@ const mockProductos = [
 ];
 
 export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
+  const router = useRouter();
+  const { crearProyecto, loading: proyectoLoading, error: proyectoError } = useProyectos();
+  
   const [loading, setLoading] = useState(false);
   const [clientes, setClientes] = useState([]);
   const [recursos, setRecursos] = useState([]);
   const [productos] = useState(mockProductos);
+  const [error, setError] = useState(null);
   
   // Estado del formulario
   const [formData, setFormData] = useState({
@@ -60,8 +50,8 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
       setFormData({
         nombre: proyecto.nombre || '',
         descripcion: proyecto.descripcion || '',
-        fechaInicio: proyecto.fechaInicio || '',
-        fechaFinEstimada: proyecto.fechaFinEstimada || '',
+        fechaInicio: proyecto.fechaInicio ? proyecto.fechaInicio.split('T')[0] : '',
+        fechaFinEstimada: proyecto.fechaFinEstimada ? proyecto.fechaFinEstimada.split('T')[0] : '',
         clienteId: proyecto.cliente?.id || '',
         liderProyecto: proyecto.liderProyecto || '',
         productos: proyecto.productos || [],
@@ -72,13 +62,39 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
 
   const cargarDatosIniciales = async () => {
     setLoading(true);
+    setError(null);
+    
     try {
-      // Simular llamadas a APIs
+      // TODO: Reemplazar con llamadas reales a APIs cuando estén disponibles
+      // const [clientesData, recursosData] = await Promise.all([
+      //   apiCall('/api/clientes'),
+      //   apiCall('/api/recursos')
+      // ]);
+      
+      // Por ahora usar mock data - cuando tengas las APIs, reemplaza esto
       await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const mockClientes = [
+        { id: 1, nombre: "Empresa ABC S.A.", email: "contacto@empresaabc.com" },
+        { id: 2, nombre: "TechCorp Ltd.", email: "info@techcorp.com" },
+        { id: 3, nombre: "InnovateCorp", email: "hello@innovatecorp.com" },
+        { id: 4, nombre: "Global Solutions", email: "contact@globalsolutions.com" }
+      ];
+
+      const mockRecursos = [
+        { id: 1, nombre: "Leonardo", apellido: "Felici", legajo: "EMP001" },
+        { id: 2, nombre: "María", apellido: "González", legajo: "EMP002" },
+        { id: 3, nombre: "Carlos", apellido: "Mendoza", legajo: "EMP003" },
+        { id: 4, nombre: "Ana", apellido: "Rodríguez", legajo: "EMP004" },
+        { id: 5, nombre: "Pedro", apellido: "López", legajo: "EMP005" }
+      ];
+      
       setClientes(mockClientes);
       setRecursos(mockRecursos);
-    } catch (error) {
-      console.error('Error cargando datos:', error);
+      
+    } catch (err) {
+      setError('Error cargando datos iniciales: ' + err.message);
+      console.error('Error cargando datos:', err);
     } finally {
       setLoading(false);
     }
@@ -121,6 +137,7 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
     const recursoCompleto = {
       id: recurso.id,
       nombre: `${recurso.nombre} ${recurso.apellido}`,
+      legajo: recurso.legajo,
       rol: rol
     };
     
@@ -167,10 +184,6 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
       }
     }
 
-    if (!formData.clienteId) {
-      nuevosErrores.clienteId = 'Debe seleccionar un cliente';
-    }
-
     if (!formData.liderProyecto.trim()) {
       nuevosErrores.liderProyecto = 'Debe asignar un líder de proyecto';
     }
@@ -185,25 +198,69 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
     }
 
     setLoading(true);
+    setError(null);
+    
     try {
-      // Simular guardado
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Preparar datos para enviar al backend
+      // ✅ Preparar datos según el formato esperado por la API
       const proyectoData = {
-        ...formData,
-        cliente: clientes.find(c => c.id === parseInt(formData.clienteId)),
-        estado: proyecto ? proyecto.estado : 'ACTIVO'
+        nombre: formData.nombre.trim(),
+        descripcion: formData.descripcion.trim(),
+        fechaInicio: formData.fechaInicio,
+        fechaFinEstimada: formData.fechaFinEstimada,
+        liderProyecto: formData.liderProyecto.trim(),
+        // TODO: Agregar cliente cuando la API lo soporte
+        // clienteId: formData.clienteId,
+        // productos: formData.productos,
+        // recursos: formData.recursosAsignados
       };
 
-      onSave && onSave(proyectoData);
+      let resultado;
+      if (proyecto) {
+        // TODO: Implementar actualización cuando esté disponible en el hook
+        // resultado = await actualizarProyecto(proyecto.idProyecto, proyectoData);
+        console.log('Actualizando proyecto:', proyectoData);
+        resultado = { ...proyecto, ...proyectoData };
+      } else {
+        // ✅ Crear nuevo proyecto usando el hook real
+        resultado = await crearProyecto(proyectoData);
+      }
+
+      // ✅ Callback personalizado o navegación
+      if (onSave) {
+        onSave(resultado);
+      } else {
+        // Navegar al detalle del proyecto creado
+        router.push(`/Proyecto/${resultado.idProyecto}`);
+      }
       
-    } catch (error) {
-      console.error('Error guardando proyecto:', error);
+    } catch (err) {
+      setError(err.message || 'Error guardando el proyecto');
+      console.error('Error guardando proyecto:', err);
     } finally {
       setLoading(false);
     }
   };
+
+  // ✅ Manejo de errores de carga
+  if (error && !clientes.length && !loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 mb-4">
+            <AlertCircle className="w-16 h-16 mx-auto" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error cargando formulario</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={cargarDatosIniciales}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading && !clientes.length) {
     return (
@@ -223,7 +280,7 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
             <button 
-              onClick={onCancel}
+              onClick={onCancel || (() => router.back())}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -241,6 +298,17 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* ✅ Mostrar errores de API */}
+        {(error || proyectoError) && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-500" />
+              <span className="text-red-800 font-medium">Error:</span>
+              <span className="text-red-700">{error || proyectoError}</span>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-6">
           {/* Información Básica */}
           <div className="bg-white rounded-lg shadow-md p-6">
@@ -319,31 +387,24 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
 
           {/* Cliente y Líder */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Cliente y Responsables</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Responsables</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              {/* TODO: Habilitar cuando la API soporte clientes */}
+              <div className="opacity-50">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cliente *
+                  Cliente (Próximamente)
                 </label>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <select
-                    value={formData.clienteId}
-                    onChange={(e) => handleInputChange('clienteId', e.target.value)}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                      errors.clienteId ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    disabled
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
                   >
-                    <option value="">Seleccionar cliente</option>
-                    {clientes.map(cliente => (
-                      <option key={cliente.id} value={cliente.id}>
-                        {cliente.nombre}
-                      </option>
-                    ))}
+                    <option value="">Funcionalidad en desarrollo</option>
                   </select>
                 </div>
-                {errors.clienteId && <p className="text-red-500 text-sm mt-1">{errors.clienteId}</p>}
+                <p className="text-xs text-gray-500 mt-1">Esta funcionalidad se habilitará cuando esté lista la API de clientes</p>
               </div>
 
               <div>
@@ -367,103 +428,55 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
             </div>
           </div>
 
-          {/* Productos */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          {/* Productos - Temporal hasta que esté la API */}
+          <div className="bg-white rounded-lg shadow-md p-6 opacity-50">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Productos y Versiones</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Productos y Versiones (Próximamente)</h2>
               <button
                 type="button"
-                onClick={() => setShowProductoModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm"
+                disabled
+                className="bg-gray-400 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm cursor-not-allowed"
               >
                 <Plus className="w-4 h-4" />
                 Agregar Producto
               </button>
             </div>
-
-            {formData.productos.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {formData.productos.map((producto, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm"
-                  >
-                    <Package className="w-4 h-4" />
-                    {producto}
-                    <button
-                      type="button"
-                      onClick={() => quitarProducto(producto)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm">No hay productos agregados</p>
-            )}
+            <p className="text-gray-500 text-sm">Esta funcionalidad se habilitará cuando esté lista la integración completa</p>
           </div>
 
-          {/* Recursos */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          {/* Recursos - Temporal hasta que esté la API */}
+          <div className="bg-white rounded-lg shadow-md p-6 opacity-50">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Recursos Asignados</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Recursos Asignados (Próximamente)</h2>
               <button
                 type="button"
-                onClick={() => setShowRecursoModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm"
+                disabled
+                className="bg-gray-400 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm cursor-not-allowed"
               >
                 <Plus className="w-4 h-4" />
                 Asignar Recurso
               </button>
             </div>
-
-            {formData.recursosAsignados.length > 0 ? (
-              <div className="space-y-2">
-                {formData.recursosAsignados.map((recurso, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <User className="w-5 h-5 text-gray-400" />
-                      <div>
-                        <p className="font-medium text-gray-900">{recurso.nombre}</p>
-                        <p className="text-sm text-gray-500">{recurso.rol}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => quitarRecurso(recurso.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm">No hay recursos asignados</p>
-            )}
+            <p className="text-gray-500 text-sm">Esta funcionalidad se habilitará cuando esté lista la API de recursos</p>
           </div>
 
           {/* Botones */}
           <div className="flex justify-end gap-4">
             <button
               type="button"
-              onClick={onCancel}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              onClick={onCancel || (() => router.back())}
+              disabled={loading || proyectoLoading}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || proyectoLoading}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50"
             >
-              {loading ? (
+              {(loading || proyectoLoading) ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <Save className="w-4 h-4" />
@@ -474,7 +487,7 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
         </div>
       </div>
 
-      {/* Modal Agregar Producto */}
+      {/* Modal Agregar Producto - Deshabilitado temporalmente */}
       {showProductoModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -510,7 +523,7 @@ export default function ProyectoForm({ proyecto = null, onCancel, onSave }) {
         </div>
       )}
 
-      {/* Modal Asignar Recurso */}
+      {/* Modal Asignar Recurso - Deshabilitado temporalmente */}
       {showRecursoModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
