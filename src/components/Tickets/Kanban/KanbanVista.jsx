@@ -1,10 +1,26 @@
 import ColumnaKanban from "./ColumnaKanban";
 import { opciones } from "@/api/mock/opcionesSelect";
+import { useState, useEffect, use } from "react";
+import { getMetadatos } from "@/api/tickets";
 
 export default function KanbanVista({ tickets }) {
-  const ticketsPorEstado = opciones.estado.map((estado) => ({
-    estado,
-    tickets: tickets.filter((t) => t.estado === estado),
+  const [metadatos, setMetadatos] = useState({
+    estados: [],
+    prioridades: [],
+    severidades: [],
+  });
+
+  useEffect(() => {
+    async function fetchMetadatos() {
+      const data = await getMetadatos();
+      setMetadatos(data);
+    }
+    fetchMetadatos();
+  }, []);
+
+  const ticketsPorEstado = metadatos.estados.map((estado) => ({
+    estado: estado.label,
+    tickets: tickets.filter((t) => t.estado === estado.label.toLowerCase()),
   }));
 
   return (

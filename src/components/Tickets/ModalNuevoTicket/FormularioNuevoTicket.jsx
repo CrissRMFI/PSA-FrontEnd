@@ -33,7 +33,6 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
     getResponsables().then(setResponsables).catch(console.error);
     getMetadatos()
       .then((data) => {
-        console.log("Metadatos:", data);
         setPrioridadesMeta(data.prioridades);
         setSeveridadesMeta(data.severidades);
       })
