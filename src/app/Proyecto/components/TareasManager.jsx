@@ -6,149 +6,42 @@ import {
   List, Grid, ArrowLeft, Save, X, Users, Target, Layers,
   Percent, Split, Link
 } from 'lucide-react';
+import { useTareas, useFases } from '../../../api/hooks'; // ✅ Usar hooks reales
+import TareaAvanzadaForm from './TareaAvanzadaForm'; // ✅ Importar formulario
 
-// Mock data actualizado - modelo con múltiples fases por tarea
-const mockTareasAvanzadas = [
-  {
-    id: 1,
-    nombre: "Análisis de requerimientos funcionales",
-    descripcion: "Documentar todos los requerimientos del cliente para el módulo de ventas",
-    estado: "COMPLETADA",
-    prioridad: "ALTA",
-    asignadoA: { id: 1, nombre: "Leonardo Felici" },
-    fechaInicio: "2024-01-15",
-    fechaFin: "2024-01-25",
-    fechaFinReal: "2024-01-24",
-    porcentajeAvance: 100,
-    estimacionHoras: 40,
-    horasReales: 38,
-    dependencias: [],
-    comentarios: 3,
-    participacionFases: [
-      {
-        faseId: 1,
-        faseName: "Análisis y Diseño",
-        porcentajeParticipacion: 100,
-        fechaInicioFase: "2024-01-15",
-        fechaFinFase: "2024-01-25",
-        estadoEnFase: "COMPLETADA",
-        horasEnFase: 38,
-        entregablesEnFase: ["Documento de requerimientos", "Matriz de trazabilidad"]
-      }
-    ]
-  },
-  {
-    id: 2,
-    nombre: "Diseño de arquitectura del sistema",
-    descripcion: "Crear el diseño técnico y arquitectura para el nuevo módulo",
-    estado: "COMPLETADA",
-    prioridad: "ALTA",
-    asignadoA: { id: 2, nombre: "María González" },
-    fechaInicio: "2024-01-26",
-    fechaFin: "2024-02-10",
-    fechaFinReal: "2024-02-08",
-    porcentajeAvance: 100,
-    estimacionHoras: 60,
-    horasReales: 55,
-    dependencias: [1],
-    comentarios: 5,
-    participacionFases: [
-      {
-        faseId: 1,
-        faseName: "Análisis y Diseño",
-        porcentajeParticipacion: 80,
-        fechaInicioFase: "2024-01-26",
-        fechaFinFase: "2024-02-08",
-        estadoEnFase: "COMPLETADA",
-        horasEnFase: 44,
-        entregablesEnFase: ["Diseño de arquitectura", "Diagramas UML"]
-      },
-      {
-        faseId: 2,
-        faseName: "Desarrollo",
-        porcentajeParticipacion: 20,
-        fechaInicioFase: "2024-02-09",
-        fechaFinFase: "2024-02-10",
-        estadoEnFase: "COMPLETADA",
-        horasEnFase: 11,
-        entregablesEnFase: ["Setup inicial del proyecto"]
-      }
-    ]
-  },
-  {
-    id: 3,
-    nombre: "Desarrollo módulo de usuarios",
-    descripcion: "Implementar funcionalidades de gestión de usuarios y permisos",
-    estado: "EN_PROGRESO",
-    prioridad: "ALTA",
-    asignadoA: { id: 2, nombre: "María González" },
-    fechaInicio: "2024-02-16",
-    fechaFin: "2024-03-15",
-    fechaFinReal: null,
-    porcentajeAvance: 75,
-    estimacionHoras: 80,
-    horasReales: 60,
-    dependencias: [2],
-    comentarios: 8,
-    participacionFases: [
-      {
-        faseId: 2,
-        faseName: "Desarrollo",
-        porcentajeParticipacion: 90,
-        fechaInicioFase: "2024-02-16",
-        fechaFinFase: "2024-03-10",
-        estadoEnFase: "EN_PROGRESO",
-        horasEnFase: 54,
-        entregablesEnFase: ["Módulo de usuarios", "APIs de autenticación", "UI de gestión"]
-      },
-      {
-        faseId: 3,
-        faseName: "Testing y QA",
-        porcentajeParticipacion: 10,
-        fechaInicioFase: "2024-03-11",
-        fechaFinFase: "2024-03-15",
-        estadoEnFase: "PENDIENTE",
-        horasEnFase: 6,
-        entregablesEnFase: ["Pruebas unitarias del módulo"]
-      }
-    ]
-  }
-];
-
-const mockFases = [
-  { id: 1, nombre: "Análisis y Diseño", orden: 1, color: "#3B82F6" },
-  { id: 2, nombre: "Desarrollo", orden: 2, color: "#8B5CF6" },
-  { id: 3, nombre: "Testing y QA", orden: 3, color: "#10B981" },
-  { id: 4, nombre: "Despliegue", orden: 4, color: "#F59E0B" }
-];
-
+// Recursos temporales - TODO: Mover a API cuando esté disponible
 const mockRecursos = [
   { id: 1, nombre: "Leonardo Felici", rol: "Project Manager" },
   { id: 2, nombre: "María González", rol: "Desarrollador Senior" },
   { id: 3, nombre: "Carlos Mendoza", rol: "Analista Funcional" },
   { id: 4, nombre: "Ana Rodríguez", rol: "Tester" }
 ];
-// Continúa desde la Parte 1...
 
 function EstadoBadge({ estado }) {
   const getEstadoStyles = (estado) => {
     switch (estado) {
       case 'COMPLETADA':
+      case 'Completada':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'EN_PROGRESO':
+      case 'En Progreso':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'PENDIENTE':
+      case 'Pendiente':
         return 'bg-gray-100 text-gray-800 border-gray-200';
       case 'VENCIDA':
+      case 'Vencida':
         return 'bg-red-100 text-red-800 border-red-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
+  const estadoTexto = estado?.replace('_', ' ') || 'Sin estado';
+
   return (
     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getEstadoStyles(estado)}`}>
-      {estado.replace('_', ' ')}
+      {estadoTexto}
     </span>
   );
 }
@@ -157,10 +50,13 @@ function PrioridadBadge({ prioridad }) {
   const getPrioridadStyles = (prioridad) => {
     switch (prioridad) {
       case 'ALTA':
+      case 'Alta':
         return 'bg-red-100 text-red-800';
       case 'MEDIA':
+      case 'Media':
         return 'bg-yellow-100 text-yellow-800';
       case 'BAJA':
+      case 'Baja':
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -170,10 +66,13 @@ function PrioridadBadge({ prioridad }) {
   const getPrioridadIcon = (prioridad) => {
     switch (prioridad) {
       case 'ALTA':
+      case 'Alta':
         return '🔴';
       case 'MEDIA':
+      case 'Media':
         return '🟡';
       case 'BAJA':
+      case 'Baja':
         return '🟢';
       default:
         return '⚪';
@@ -183,32 +82,32 @@ function PrioridadBadge({ prioridad }) {
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded ${getPrioridadStyles(prioridad)}`}>
       <span>{getPrioridadIcon(prioridad)}</span>
-      {prioridad}
+      {prioridad || 'Sin prioridad'}
     </span>
   );
 }
 
-function ParticipacionFases({ participaciones, compact = false }) {
-  const mockFases = [
-    { id: 1, nombre: "Análisis y Diseño", color: "#3B82F6" },
-    { id: 2, nombre: "Desarrollo", color: "#8B5CF6" },
-    { id: 3, nombre: "Testing y QA", color: "#10B981" },
-    { id: 4, nombre: "Despliegue", color: "#F59E0B" }
-  ];
+function ParticipacionFases({ participaciones = [], fases = [], compact = false }) {
+  if (!participaciones || participaciones.length === 0) {
+    return compact ? null : <p className="text-sm text-gray-500">Sin asignación a fases</p>;
+  }
 
   if (compact) {
     return (
       <div className="flex flex-wrap gap-1">
-        {participaciones.map((participacion, index) => (
-          <span 
-            key={index}
-            className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full text-white"
-            style={{ backgroundColor: mockFases.find(f => f.id === participacion.faseId)?.color }}
-          >
-            <Layers className="w-3 h-3" />
-            {participacion.porcentajeParticipacion}%
-          </span>
-        ))}
+        {participaciones.map((participacion, index) => {
+          const fase = fases.find(f => f.idFase === participacion.faseId || f.id === participacion.faseId);
+          return (
+            <span 
+              key={index}
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full text-white"
+              style={{ backgroundColor: fase?.color || '#3B82F6' }}
+            >
+              <Layers className="w-3 h-3" />
+              {participacion.porcentajeParticipacion || 100}%
+            </span>
+          );
+        })}
       </div>
     );
   }
@@ -217,45 +116,40 @@ function ParticipacionFases({ participaciones, compact = false }) {
     <div className="space-y-2">
       <h4 className="text-sm font-medium text-gray-900">Participación en fases:</h4>
       <div className="space-y-2">
-        {participaciones.map((participacion, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <div 
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: mockFases.find(f => f.id === participacion.faseId)?.color }}
-            />
-            <span className="text-sm text-gray-700 flex-1">
-              {participacion.faseName}
-            </span>
-            <span className="text-sm font-medium text-gray-900">
-              {participacion.porcentajeParticipacion}%
-            </span>
-            <div className="w-16 bg-gray-200 rounded-full h-2">
+        {participaciones.map((participacion, index) => {
+          const fase = fases.find(f => f.idFase === participacion.faseId || f.id === participacion.faseId);
+          return (
+            <div key={index} className="flex items-center gap-2">
               <div 
-                className="h-2 rounded-full"
-                style={{ 
-                  width: `${participacion.porcentajeParticipacion}%`,
-                  backgroundColor: mockFases.find(f => f.id === participacion.faseId)?.color
-                }}
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: fase?.color || '#3B82F6' }}
               />
+              <span className="text-sm text-gray-700 flex-1">
+                {participacion.faseName || fase?.nombre || 'Fase desconocida'}
+              </span>
+              <span className="text-sm font-medium text-gray-900">
+                {participacion.porcentajeParticipacion || 100}%
+              </span>
+              <div className="w-16 bg-gray-200 rounded-full h-2">
+                <div 
+                  className="h-2 rounded-full"
+                  style={{ 
+                    width: `${participacion.porcentajeParticipacion || 100}%`,
+                    backgroundColor: fase?.color || '#3B82F6'
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
-// Continúa desde las Partes 1 y 2...
 
-function TareaAvanzadaCard({ tarea, onEditar, onEliminar, onCambiarEstado, recursos }) {
+function TareaAvanzadaCard({ tarea, onEditar, onEliminar, onCambiarEstado, recursos, fases }) {
   const [showMenu, setShowMenu] = useState(false);
   const [mostrarDetalles, setMostrarDetalles] = useState(false);
-
-  const mockFases = [
-    { id: 1, nombre: "Análisis y Diseño", color: "#3B82F6" },
-    { id: 2, nombre: "Desarrollo", color: "#8B5CF6" },
-    { id: 3, nombre: "Testing y QA", color: "#10B981" },
-    { id: 4, nombre: "Despliegue", color: "#F59E0B" }
-  ];
 
   const calcularDiasRestantes = () => {
     if (!tarea.fechaFin) return null;
@@ -267,26 +161,40 @@ function TareaAvanzadaCard({ tarea, onEditar, onEliminar, onCambiarEstado, recur
   };
 
   const diasRestantes = calcularDiasRestantes();
-  const isVencida = diasRestantes !== null && diasRestantes < 0 && tarea.estado !== 'COMPLETADA';
+  const isVencida = diasRestantes !== null && diasRestantes < 0 && tarea.estado !== 'COMPLETADA' && tarea.estado !== 'Completada';
 
   const getEstadoIcon = (estado) => {
-    switch (estado) {
-      case 'COMPLETADA':
+    const estadoNormalizado = estado?.toLowerCase();
+    switch (estadoNormalizado) {
+      case 'completada':
         return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'EN_PROGRESO':
+      case 'en progreso':
+      case 'en_progreso':
         return <Clock className="w-4 h-4 text-blue-600" />;
-      case 'PENDIENTE':
+      case 'pendiente':
         return <AlertTriangle className="w-4 h-4 text-gray-400" />;
-      case 'VENCIDA':
+      case 'vencida':
         return <AlertTriangle className="w-4 h-4 text-red-600" />;
       default:
         return <Clock className="w-4 h-4 text-gray-400" />;
     }
   };
 
-  const fasePrincipal = tarea.participacionFases.reduce((prev, current) => 
-    current.porcentajeParticipacion > prev.porcentajeParticipacion ? current : prev
-  );
+  // ✅ Adaptar a la estructura real de la API con fallbacks
+  const participaciones = tarea.participacionFases || [];
+  const asignadoA = tarea.asignadoA || tarea.asignado || { nombre: 'Sin asignar' };
+  const dependencias = tarea.dependencias || [];
+
+  // Obtener fase principal (la que más participación tiene)
+  const fasePrincipal = participaciones.length > 0 
+    ? participaciones.reduce((prev, current) => 
+        (current.porcentajeParticipacion || 100) > (prev.porcentajeParticipacion || 100) ? current : prev
+      )
+    : null;
+
+  const faseColor = fasePrincipal 
+    ? fases.find(f => f.idFase === fasePrincipal.faseId || f.id === fasePrincipal.faseId)?.color || '#3B82F6'
+    : '#3B82F6';
 
   return (
     <div className={`bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow ${
@@ -295,25 +203,27 @@ function TareaAvanzadaCard({ tarea, onEditar, onEliminar, onCambiarEstado, recur
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           <div className="flex items-start gap-2 mb-2">
-            {getEstadoIcon(isVencida ? 'VENCIDA' : tarea.estado)}
+            {getEstadoIcon(isVencida ? 'vencida' : tarea.estado)}
             <h3 className="font-medium text-gray-900 line-clamp-2">{tarea.nombre}</h3>
-            {tarea.participacionFases.length > 1 && (
+            {participaciones.length > 1 && (
               <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
                 <Split className="w-3 h-3" />
                 Multi-fase
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-600 line-clamp-2 mb-2">{tarea.descripcion}</p>
+          <p className="text-sm text-gray-600 line-clamp-2 mb-2">{tarea.descripcion || 'Sin descripción'}</p>
           
           <div className="flex gap-2 mb-3">
             <EstadoBadge estado={isVencida ? 'VENCIDA' : tarea.estado} />
             <PrioridadBadge prioridad={tarea.prioridad} />
           </div>
 
-          <div className="mb-3">
-            <ParticipacionFases participaciones={tarea.participacionFases} compact={true} />
-          </div>
+          {participaciones.length > 0 && (
+            <div className="mb-3">
+              <ParticipacionFases participaciones={participaciones} fases={fases} compact={true} />
+            </div>
+          )}
         </div>
 
         <div className="relative">
@@ -376,16 +286,18 @@ function TareaAvanzadaCard({ tarea, onEditar, onEliminar, onCambiarEstado, recur
       <div className="space-y-2 text-sm">
         <div className="flex items-center gap-2 text-gray-600">
           <User className="w-4 h-4" />
-          <span>{tarea.asignadoA.nombre}</span>
+          <span>{asignadoA.nombre}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-gray-600">
-          <Calendar className="w-4 h-4" />
-          <span>
-            {new Date(tarea.fechaInicio).toLocaleDateString('es-ES')} - {' '}
-            {new Date(tarea.fechaFin).toLocaleDateString('es-ES')}
-          </span>
-        </div>
+        {(tarea.fechaInicio || tarea.fechaFin) && (
+          <div className="flex items-center gap-2 text-gray-600">
+            <Calendar className="w-4 h-4" />
+            <span>
+              {tarea.fechaInicio ? new Date(tarea.fechaInicio).toLocaleDateString('es-ES') : 'Sin fecha'} - {' '}
+              {tarea.fechaFin ? new Date(tarea.fechaFin).toLocaleDateString('es-ES') : 'Sin fecha'}
+            </span>
+          </div>
+        )}
 
         {diasRestantes !== null && (
           <div className={`flex items-center gap-2 ${
@@ -402,35 +314,43 @@ function TareaAvanzadaCard({ tarea, onEditar, onEliminar, onCambiarEstado, recur
           </div>
         )}
 
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600">Progreso:</span>
-          <span className="font-medium">{tarea.porcentajeAvance}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className={`h-2 rounded-full transition-all duration-300`}
-            style={{ 
-              width: `${tarea.porcentajeAvance}%`,
-              backgroundColor: mockFases.find(f => f.id === fasePrincipal.faseId)?.color || '#3B82F6'
-            }}
-          />
-        </div>
+        {/* Progreso - mostrar solo si existe */}
+        {tarea.porcentajeAvance !== undefined && (
+          <>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Progreso:</span>
+              <span className="font-medium">{tarea.porcentajeAvance || 0}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="h-2 rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${tarea.porcentajeAvance || 0}%`,
+                  backgroundColor: faseColor
+                }}
+              />
+            </div>
+          </>
+        )}
 
-        <div className="flex justify-between text-xs text-gray-500 pt-2 border-t">
-          <span>{tarea.horasReales}h / {tarea.estimacionHoras}h</span>
-          <span>{tarea.comentarios} comentarios</span>
-        </div>
+        {/* Horas - mostrar solo si existe */}
+        {(tarea.horasReales !== undefined || tarea.estimacionHoras !== undefined) && (
+          <div className="flex justify-between text-xs text-gray-500 pt-2 border-t">
+            <span>{tarea.horasReales || 0}h / {tarea.estimacionHoras || 0}h</span>
+            <span>{tarea.comentarios || 0} comentarios</span>
+          </div>
+        )}
       </div>
 
       {mostrarDetalles && (
         <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
-          <ParticipacionFases participaciones={tarea.participacionFases} />
+          <ParticipacionFases participaciones={participaciones} fases={fases} />
           
-          {tarea.dependencias.length > 0 && (
+          {dependencias.length > 0 && (
             <div>
               <h4 className="text-sm font-medium text-gray-900 mb-1">Dependencias:</h4>
               <div className="flex gap-1">
-                {tarea.dependencias.map((dep, index) => (
+                {dependencias.map((dep, index) => (
                   <span key={index} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
                     <Link className="w-3 h-3" />
                     Tarea #{dep}
@@ -444,13 +364,30 @@ function TareaAvanzadaCard({ tarea, onEditar, onEliminar, onCambiarEstado, recur
     </div>
   );
 }
-// Combina todas las partes anteriores y agrega el componente principal
 
 export default function TareasManagerAvanzado({ proyectoId, faseIdSeleccionada = null, onVolver }) {
-  const [tareas, setTareas] = useState([]);
-  const [fases, setFases] = useState([]);
+  // ✅ Usar hooks reales en lugar de mock data
+  const { 
+    tareasVencidas, 
+    tareasMultifase, 
+    loading: tareasLoading, 
+    error: tareasError,
+    cargarTareasEspeciales,
+    crearTarea,
+    asignarTareaAFase,
+    iniciarTarea,
+    completarTarea
+  } = useTareas();
+
+  const { 
+    fases, 
+    loading: fasesLoading, 
+    error: fasesError 
+  } = useFases(proyectoId);
+
   const [recursos, setRecursos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingRecursos, setLoadingRecursos] = useState(true);
+  const [tareas, setTareas] = useState([]);
   const [vista, setVista] = useState('fases');
   const [filtros, setFiltros] = useState({
     busqueda: '',
@@ -461,39 +398,68 @@ export default function TareasManagerAvanzado({ proyectoId, faseIdSeleccionada =
     soloMultifase: false
   });
 
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [tareaEditando, setTareaEditando] = useState(null);
+
   useEffect(() => {
     cargarDatos();
   }, [proyectoId]);
 
   const cargarDatos = async () => {
-    setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setTareas(mockTareasAvanzadas);
-      setFases(mockFases);
-      setRecursos(mockRecursos);
+      // ✅ Cargar tareas especiales (vencidas y multifase)
+      await cargarTareasEspeciales();
+      
+      // ✅ Cargar recursos (temporal)
+      await cargarRecursos();
+      
+      // TODO: Cargar todas las tareas del proyecto cuando esté disponible
+      // const tareasProyecto = await apiCall(`/api/proyectos/${proyectoId}/tareas`);
+      // setTareas(tareasProyecto);
+      
     } catch (error) {
       console.error('Error cargando datos:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const tareasFiltradas = tareas.filter(tarea => {
-    const cumpleBusqueda = tarea.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase());
+  const cargarRecursos = async () => {
+    setLoadingRecursos(true);
+    try {
+      // TODO: Reemplazar con API real cuando esté disponible
+      // const recursosData = await apiCall('/api/recursos');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setRecursos(mockRecursos);
+    } catch (error) {
+      console.error('Error cargando recursos:', error);
+    } finally {
+      setLoadingRecursos(false);
+    }
+  };
+
+  // ✅ Combinar tareas de diferentes fuentes
+  const todasLasTareas = [
+    ...tareasVencidas.map(t => ({ ...t, esVencida: true })),
+    ...tareasMultifase.map(t => ({ ...t, esMultifase: true })),
+    ...tareas
+  ];
+
+  // ✅ Filtrar tareas según criterios
+  const tareasFiltradas = todasLasTareas.filter(tarea => {
+    const cumpleBusqueda = tarea.nombre?.toLowerCase().includes(filtros.busqueda.toLowerCase());
     const cumpleEstado = !filtros.estado || tarea.estado === filtros.estado;
     const cumplePrioridad = !filtros.prioridad || tarea.prioridad === filtros.prioridad;
-    const cumpleAsignado = !filtros.asignado || tarea.asignadoA.id == filtros.asignado;
-    const cumpleFase = !filtros.fase || tarea.participacionFases.some(p => p.faseId == filtros.fase);
-    const cumpleMultifase = !filtros.soloMultifase || tarea.participacionFases.length > 1;
+    const cumpleAsignado = !filtros.asignado || (tarea.asignadoA?.id || tarea.asignado?.id) == filtros.asignado;
+    const cumpleFase = !filtros.fase || (tarea.participacionFases && tarea.participacionFases.some(p => p.faseId == filtros.fase));
+    const cumpleMultifase = !filtros.soloMultifase || (tarea.participacionFases && tarea.participacionFases.length > 1) || tarea.esMultifase;
     
     return cumpleBusqueda && cumpleEstado && cumplePrioridad && cumpleAsignado && cumpleFase && cumpleMultifase;
   });
 
+  // ✅ Agrupar tareas por fase
   const tareasPorFase = fases.map(fase => ({
     ...fase,
     tareas: tareasFiltradas.filter(tarea => 
-      tarea.participacionFases.some(p => p.faseId === fase.id)
+      tarea.participacionFases && tarea.participacionFases.some(p => p.faseId === fase.idFase || p.faseId === fase.id)
     )
   }));
 
@@ -501,85 +467,115 @@ export default function TareasManagerAvanzado({ proyectoId, faseIdSeleccionada =
     setFiltros(prev => ({ ...prev, [campo]: valor }));
   };
 
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-const [tareaEditando, setTareaEditando] = useState(null);
+  const handleNuevaTarea = (faseId = null) => {
+    setTareaEditando(null);
+    if (faseId) {
+      setFiltros(prev => ({ ...prev, fase: faseId }));
+    }
+    setMostrarFormulario(true);
+  };
 
-const handleNuevaTarea = (faseId = null) => {
-  setTareaEditando(null);
-  if (faseId) {
-    setFiltros(prev => ({ ...prev, fase: faseId }));
-  }
-  setMostrarFormulario(true);
-};
+  const handleEditarTarea = (tarea) => {
+    setTareaEditando(tarea);
+    setMostrarFormulario(true);
+  };
 
-const handleEditarTarea = (tarea) => {
-  setTareaEditando(tarea);
-  setMostrarFormulario(true);
-};
-
-const handleGuardarTarea = (tareaData) => {
-  if (tareaEditando) {
-    // Actualizar tarea existente
-    setTareas(prev => prev.map(t => 
-      t.id === tareaEditando.id ? { ...tareaData, id: tareaEditando.id } : t
-    ));
-  } else {
-    // Crear nueva tarea
-    setTareas(prev => [...prev, tareaData]);
-  }
-  setMostrarFormulario(false);
-  setTareaEditando(null);
-};
-
-// Y al final del componente, antes del cierre, agrega:
-
-{/* Modal Formulario */}
-{mostrarFormulario && (
-  <TareaAvanzadaForm 
-    tarea={tareaEditando}
-    fases={fases}
-    recursos={recursos}
-    onGuardar={handleGuardarTarea}
-    onCancelar={() => {
+  const handleGuardarTarea = async (tareaData) => {
+    try {
+      if (tareaEditando) {
+        // TODO: Implementar actualización cuando esté disponible
+        console.log('Actualizar tarea:', tareaEditando.id, tareaData);
+        setTareas(prev => prev.map(t => 
+          t.id === tareaEditando.id ? { ...tareaData, id: tareaEditando.id } : t
+        ));
+      } else {
+        // ✅ Crear nueva tarea usando el hook real
+        const nuevaTarea = await crearTarea(tareaData);
+        setTareas(prev => [...prev, nuevaTarea]);
+      }
+      
       setMostrarFormulario(false);
       setTareaEditando(null);
-    }}
-  />
-)}
+      
+      // Recargar datos
+      await cargarTareasEspeciales();
+      
+    } catch (error) {
+      console.error('Error guardando tarea:', error);
+    }
+  };
 
   const handleEliminarTarea = (tarea) => {
     if (confirm(`¿Eliminar "${tarea.nombre}"?`)) {
+      // TODO: Implementar eliminación real cuando esté disponible
+      console.log('Eliminar tarea:', tarea.id);
       setTareas(prev => prev.filter(t => t.id !== tarea.id));
     }
   };
 
-  const handleCambiarEstado = (tarea) => {
-    const estados = ['PENDIENTE', 'EN_PROGRESO', 'COMPLETADA'];
-    const estadoActualIndex = estados.indexOf(tarea.estado);
-    const siguienteEstado = estados[(estadoActualIndex + 1) % estados.length];
-    
-    setTareas(prev => prev.map(t => 
-      t.id === tarea.id ? { ...t, estado: siguienteEstado } : t
-    ));
+  const handleCambiarEstado = async (tarea) => {
+    try {
+      const estados = ['PENDIENTE', 'EN_PROGRESO', 'COMPLETADA'];
+      const estadoActualIndex = estados.indexOf(tarea.estado);
+      const siguienteEstado = estados[(estadoActualIndex + 1) % estados.length];
+      
+      if (siguienteEstado === 'EN_PROGRESO') {
+        await iniciarTarea(tarea.id);
+      } else if (siguienteEstado === 'COMPLETADA') {
+        await completarTarea(tarea.id);
+      }
+      
+      // Actualizar localmente
+      setTareas(prev => prev.map(t => 
+        t.id === tarea.id ? { ...t, estado: siguienteEstado } : t
+      ));
+      
+      // Recargar datos
+      await cargarTareasEspeciales();
+      
+    } catch (error) {
+      console.error('Error cambiando estado:', error);
+    }
   };
 
   const calcularEstadisticasFase = (fase) => {
-    const tareasEnFase = tareas.filter(t => 
-      t.participacionFases.some(p => p.faseId === fase.id)
+    const tareasEnFase = todasLasTareas.filter(t => 
+      t.participacionFases && t.participacionFases.some(p => p.faseId === fase.idFase || p.faseId === fase.id)
     );
     
-    const completadas = tareasEnFase.filter(t => t.estado === 'COMPLETADA').length;
+    const completadas = tareasEnFase.filter(t => t.estado === 'COMPLETADA' || t.estado === 'Completada').length;
     const progreso = tareasEnFase.length > 0 ? Math.round((completadas / tareasEnFase.length) * 100) : 0;
 
     const horasEnFase = tareasEnFase.reduce((sum, tarea) => {
-      const participacion = tarea.participacionFases.find(p => p.faseId === fase.id);
-      return sum + (participacion?.horasEnFase || 0);
+      const participacion = tarea.participacionFases?.find(p => p.faseId === fase.idFase || p.faseId === fase.id);
+      return sum + (participacion?.horasEnFase || tarea.horasReales || 0);
     }, 0);
 
     return { total: tareasEnFase.length, completadas, progreso, horasEnFase };
   };
 
-  if (loading) {
+  // ✅ Manejo de errores
+  if (tareasError || fasesError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 mb-4">
+            <AlertTriangle className="w-16 h-16 mx-auto" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error cargando tareas</h2>
+          <p className="text-gray-600 mb-4">{tareasError || fasesError}</p>
+          <button 
+            onClick={cargarDatos}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (tareasLoading || fasesLoading || loadingRecursos) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -630,7 +626,7 @@ const handleGuardarTarea = (tareaData) => {
                 </button>
               </div>
               
-              <button onClick={handleNuevaTarea} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+              <button onClick={() => handleNuevaTarea()} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
                 <Plus className="w-4 h-4" />
                 Nueva Tarea
               </button>
@@ -657,7 +653,7 @@ const handleGuardarTarea = (tareaData) => {
             <select value={filtros.fase} onChange={(e) => handleFiltroChange('fase', e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
               <option value="">Todas las fases</option>
               {fases.map(fase => (
-                <option key={fase.id} value={fase.id}>{fase.nombre}</option>
+                <option key={fase.idFase || fase.id} value={fase.idFase || fase.id}>{fase.nombre}</option>
               ))}
             </select>
 
@@ -702,6 +698,9 @@ const handleGuardarTarea = (tareaData) => {
               <span className="text-sm font-medium text-gray-600">Total Tareas</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">{tareasFiltradas.length}</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {tareasVencidas.length} vencidas, {tareasMultifase.length} multi-fase
+            </p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -710,7 +709,7 @@ const handleGuardarTarea = (tareaData) => {
               <span className="text-sm font-medium text-gray-600">Multi-fase</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {tareasFiltradas.filter(t => t.participacionFases.length > 1).length}
+              {tareasFiltradas.filter(t => (t.participacionFases && t.participacionFases.length > 1) || t.esMultifase).length}
             </p>
           </div>
 
@@ -720,17 +719,17 @@ const handleGuardarTarea = (tareaData) => {
               <span className="text-sm font-medium text-gray-600">Completadas</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {tareasFiltradas.filter(t => t.estado === 'COMPLETADA').length}
+              {tareasFiltradas.filter(t => t.estado === 'COMPLETADA' || t.estado === 'Completada').length}
             </p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-yellow-600" />
-              <span className="text-sm font-medium text-gray-600">En Progreso</span>
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <span className="text-sm font-medium text-gray-600">Vencidas</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {tareasFiltradas.filter(t => t.estado === 'EN_PROGRESO').length}
+              {tareasVencidas.length}
             </p>
           </div>
         </div>
@@ -742,11 +741,11 @@ const handleGuardarTarea = (tareaData) => {
               const stats = calcularEstadisticasFase(fase);
               
               return (
-                <div key={fase.id} className="bg-white rounded-lg shadow-sm border">
+                <div key={fase.idFase || fase.id} className="bg-white rounded-lg shadow-sm border">
                   <div className="border-b border-gray-200 p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: fase.color }} />
+                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: fase.color || '#3B82F6' }} />
                         <h2 className="text-lg font-semibold text-gray-900">{fase.nombre}</h2>
                         <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">
                           {stats.total} tareas
@@ -759,9 +758,9 @@ const handleGuardarTarea = (tareaData) => {
                       <div className="flex items-center gap-4">
                         <div className="text-sm text-gray-600">Progreso: {stats.progreso}%</div>
                         <div className="w-32 bg-gray-200 rounded-full h-2">
-                          <div className="h-2 rounded-full transition-all duration-300" style={{ width: `${stats.progreso}%`, backgroundColor: fase.color }} />
+                          <div className="h-2 rounded-full transition-all duration-300" style={{ width: `${stats.progreso}%`, backgroundColor: fase.color || '#3B82F6' }} />
                         </div>
-                        <button onClick={handleNuevaTarea} className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <button onClick={() => handleNuevaTarea(fase.idFase || fase.id)} className="text-blue-600 hover:text-blue-800 text-sm font-medium">
                           + Agregar
                         </button>
                       </div>
@@ -773,9 +772,10 @@ const handleGuardarTarea = (tareaData) => {
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                         {fase.tareas.map(tarea => (
                           <TareaAvanzadaCard 
-                            key={tarea.id}
+                            key={tarea.id || tarea.idTarea}
                             tarea={tarea}
                             recursos={recursos}
+                            fases={fases}
                             onEditar={handleEditarTarea}
                             onEliminar={handleEliminarTarea}
                             onCambiarEstado={handleCambiarEstado}
@@ -786,7 +786,7 @@ const handleGuardarTarea = (tareaData) => {
                       <div className="text-center py-8 text-gray-500">
                         <Target className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                         <p>No hay tareas en esta fase</p>
-                        <button onClick={handleNuevaTarea} className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2">
+                        <button onClick={() => handleNuevaTarea(fase.idFase || fase.id)} className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2">
                           Crear primera tarea
                         </button>
                       </div>
@@ -809,9 +809,10 @@ const handleGuardarTarea = (tareaData) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                   {tareasFiltradas.map(tarea => (
                     <TareaAvanzadaCard 
-                      key={tarea.id}
+                      key={tarea.id || tarea.idTarea}
                       tarea={tarea}
                       recursos={recursos}
+                      fases={fases}
                       onEditar={handleEditarTarea}
                       onEliminar={handleEliminarTarea}
                       onCambiarEstado={handleCambiarEstado}
@@ -837,15 +838,16 @@ const handleGuardarTarea = (tareaData) => {
               <p className="text-sm text-gray-600">Tareas que participan en múltiples fases del proyecto</p>
             </div>
             <div className="p-4">
-              {tareasFiltradas.filter(t => t.participacionFases.length > 1).length > 0 ? (
+              {tareasFiltradas.filter(t => (t.participacionFases && t.participacionFases.length > 1) || t.esMultifase).length > 0 ? (
                 <div className="space-y-6">
                   {tareasFiltradas
-                    .filter(t => t.participacionFases.length > 1)
+                    .filter(t => (t.participacionFases && t.participacionFases.length > 1) || t.esMultifase)
                     .map(tarea => (
-                      <div key={tarea.id} className="border border-gray-200 rounded-lg p-4">
+                      <div key={tarea.id || tarea.idTarea} className="border border-gray-200 rounded-lg p-4">
                         <TareaAvanzadaCard 
                           tarea={tarea}
                           recursos={recursos}
+                          fases={fases}
                           onEditar={handleEditarTarea}
                           onEliminar={handleEliminarTarea}
                           onCambiarEstado={handleCambiarEstado}
@@ -861,7 +863,7 @@ const handleGuardarTarea = (tareaData) => {
                   <p className="text-gray-600 mb-4">
                     Las tareas multi-fase participan en varias fases del proyecto simultáneamente
                   </p>
-                  <button onClick={handleNuevaTarea} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                  <button onClick={() => handleNuevaTarea()} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                     Crear Tarea Multi-fase
                   </button>
                 </div>
@@ -883,12 +885,41 @@ const handleGuardarTarea = (tareaData) => {
                 : 'Crea la primera tarea del proyecto'
               }
             </p>
-            <button onClick={handleNuevaTarea} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            <button onClick={() => handleNuevaTarea()} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
               Nueva Tarea
             </button>
           </div>
         )}
+
+        {/* Información sobre datos de API */}
+        {(tareasVencidas.length > 0 || tareasMultifase.length > 0) && (
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="w-5 h-5 text-blue-600" />
+              <span className="text-sm font-medium text-blue-800">Datos de API</span>
+            </div>
+            <p className="text-sm text-blue-700">
+              Mostrando {tareasVencidas.length} tareas vencidas y {tareasMultifase.length} tareas multi-fase desde la API real.
+              {' '}Las funcionalidades completas de gestión de tareas estarán disponibles cuando se implemente la API completa.
+            </p>
+          </div>
+        )}
       </div>
+
+      {/* Modal Formulario */}
+      {mostrarFormulario && (
+        <TareaAvanzadaForm 
+          tarea={tareaEditando}
+          fases={fases}
+          recursos={recursos}
+          proyectoId={proyectoId}
+          onGuardar={handleGuardarTarea}
+          onCancelar={() => {
+            setMostrarFormulario(false);
+            setTareaEditando(null);
+          }}
+        />
+      )}
     </div>
   );
 }

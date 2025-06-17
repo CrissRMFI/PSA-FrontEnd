@@ -3,141 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { 
   Plus, Edit, Trash2, Save, X, Calendar, Target, 
   ArrowUp, ArrowDown, MoreVertical, CheckCircle, 
-  Clock, AlertTriangle, BarChart3, Users, GripVertical  // ✅ USAR ESTE
+  Clock, AlertTriangle, BarChart3, Users, GripVertical 
 } from 'lucide-react';
+import { useFases } from '../../../api/hooks'; // ✅ Usar hook real
 
-// Mock data - después esto viene del backend
-const mockFases = [
-  {
-    id: 1,
-    nombre: "Análisis y Diseño",
-    descripcion: "Fase inicial de análisis de requerimientos y diseño de la solución",
-    orden: 1,
-    fechaInicio: "2024-01-15",
-    fechaFinEstimada: "2024-02-15",
-    fechaFinReal: "2024-02-14",
-    estado: "COMPLETADA",
-    color: "#3B82F6", // blue
-    prerequisitos: [],
-    entregables: [
-      "Documento de requerimientos",
-      "Diseño de arquitectura",
-      "Wireframes y mockups"
-    ],
-    responsables: [
-      { id: 1, nombre: "Leonardo Felici", rol: "Project Manager" },
-      { id: 3, nombre: "Carlos Mendoza", rol: "Analista Funcional" }
-    ],
-    porcentajeAvance: 100,
-    presupuestoAsignado: 50000,
-    presupuestoUtilizado: 48000,
-    horasEstimadas: 200,
-    horasReales: 195,
-    riesgos: [],
-    notas: "Fase completada satisfactoriamente dentro del tiempo estimado"
-  },
-  {
-    id: 2,
-    nombre: "Desarrollo",
-    descripcion: "Implementación del código y desarrollo de funcionalidades",
-    orden: 2,
-    fechaInicio: "2024-02-16",
-    fechaFinEstimada: "2024-04-30",
-    fechaFinReal: null,
-    estado: "EN_PROGRESO",
-    color: "#8B5CF6", // purple
-    prerequisitos: [1],
-    entregables: [
-      "Módulo de usuarios",
-      "Módulo de reportes",
-      "APIs REST",
-      "Base de datos actualizada"
-    ],
-    responsables: [
-      { id: 2, nombre: "María González", rol: "Desarrollador Senior" },
-      { id: 3, nombre: "Carlos Mendoza", rol: "Analista Funcional" }
-    ],
-    porcentajeAvance: 65,
-    presupuestoAsignado: 200000,
-    presupuestoUtilizado: 130000,
-    horasEstimadas: 800,
-    horasReales: 520,
-    riesgos: [
-      {
-        id: 1,
-        descripcion: "Complejidad mayor a la estimada en módulo de reportes",
-        impacto: "MEDIO",
-        probabilidad: "ALTA"
-      }
-    ],
-    notas: "En progreso, algunas funcionalidades más complejas de lo previsto"
-  },
-  {
-    id: 3,
-    nombre: "Testing y QA",
-    descripcion: "Pruebas exhaustivas y control de calidad del software",
-    orden: 3,
-    fechaInicio: "2024-04-15",
-    fechaFinEstimada: "2024-06-15",
-    fechaFinReal: null,
-    estado: "PENDIENTE",
-    color: "#10B981", // green
-    prerequisitos: [2],
-    entregables: [
-      "Plan de pruebas",
-      "Casos de prueba ejecutados",
-      "Reporte de bugs",
-      "Documentación de testing"
-    ],
-    responsables: [
-      { id: 4, nombre: "Ana Rodríguez", rol: "Tester" }
-    ],
-    porcentajeAvance: 0,
-    presupuestoAsignado: 80000,
-    presupuestoUtilizado: 0,
-    horasEstimadas: 400,
-    horasReales: 0,
-    riesgos: [
-      {
-        id: 2,
-        descripcion: "Posibles retrasos si desarrollo se extiende",
-        impacto: "ALTO",
-        probabilidad: "MEDIA"
-      }
-    ],
-    notas: "Pendiente de inicio, dependiente de finalización de desarrollo"
-  },
-  {
-    id: 4,
-    nombre: "Despliegue",
-    descripcion: "Implementación en producción y puesta en marcha",
-    orden: 4,
-    fechaInicio: "2024-06-16",
-    fechaFinEstimada: "2024-06-30",
-    fechaFinReal: null,
-    estado: "PENDIENTE",
-    color: "#F59E0B", // orange
-    prerequisitos: [3],
-    entregables: [
-      "Sistema en producción",
-      "Documentación de despliegue",
-      "Manual de usuario",
-      "Capacitación realizada"
-    ],
-    responsables: [
-      { id: 1, nombre: "Leonardo Felici", rol: "Project Manager" },
-      { id: 2, nombre: "María González", rol: "Desarrollador Senior" }
-    ],
-    porcentajeAvance: 0,
-    presupuestoAsignado: 70000,
-    presupuestoUtilizado: 0,
-    horasEstimadas: 300,
-    horasReales: 0,
-    riesgos: [],
-    notas: "Fase final del proyecto"
-  }
-];
-
+// Recursos temporales - TODO: Mover a API cuando esté disponible
 const mockRecursos = [
   { id: 1, nombre: "Leonardo Felici", rol: "Project Manager" },
   { id: 2, nombre: "María González", rol: "Desarrollador Senior" },
@@ -160,28 +30,35 @@ function EstadoBadge({ estado }) {
   const getEstadoStyles = (estado) => {
     switch (estado) {
       case 'COMPLETADA':
+      case 'Completada':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'EN_PROGRESO':
+      case 'En Progreso':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'PENDIENTE':
+      case 'Pendiente':
         return 'bg-gray-100 text-gray-800 border-gray-200';
       case 'PAUSADA':
+      case 'Pausada':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'CANCELADA':
+      case 'Cancelada':
         return 'bg-red-100 text-red-800 border-red-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
+  const estadoTexto = estado?.replace('_', ' ') || 'Sin estado';
+
   return (
     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getEstadoStyles(estado)}`}>
-      {estado.replace('_', ' ')}
+      {estadoTexto}
     </span>
   );
 }
 
-function RiesgoIndicator({ riesgos }) {
+function RiesgoIndicator({ riesgos = [] }) {
   if (!riesgos || riesgos.length === 0) {
     return <span className="text-green-600 text-sm">✓ Sin riesgos</span>;
   }
@@ -202,7 +79,7 @@ function FaseCard({ fase, onEditar, onEliminar, onMoverArriba, onMoverAbajo, pue
   const [mostrarMenu, setMostrarMenu] = useState(false);
 
   const calcularDiasRestantes = () => {
-    if (!fase.fechaFinEstimada || fase.estado === 'COMPLETADA') return null;
+    if (!fase.fechaFinEstimada || fase.estadoDescriptivo === 'Completada') return null;
     const hoy = new Date();
     const fechaFin = new Date(fase.fechaFinEstimada);
     const diferencia = fechaFin - hoy;
@@ -212,44 +89,55 @@ function FaseCard({ fase, onEditar, onEliminar, onMoverArriba, onMoverAbajo, pue
 
   const diasRestantes = calcularDiasRestantes();
   const isAtrasada = diasRestantes !== null && diasRestantes < 0;
-  const porcentajePresupuesto = Math.round((fase.presupuestoUtilizado / fase.presupuestoAsignado) * 100);
+
+  // ✅ Adaptar a la estructura real de la API
+  const porcentajePresupuesto = fase.presupuestoAsignado > 0 
+    ? Math.round(((fase.presupuestoUtilizado || 0) / fase.presupuestoAsignado) * 100)
+    : 0;
 
   const getEstadoIcon = (estado) => {
-    switch (estado) {
-      case 'COMPLETADA':
+    const estadoNormalizado = estado?.toLowerCase();
+    switch (estadoNormalizado) {
+      case 'completada':
         return <CheckCircle className="w-5 h-5 text-green-600" />;
-      case 'EN_PROGRESO':
+      case 'en progreso':
         return <Clock className="w-5 h-5 text-blue-600" />;
-      case 'PENDIENTE':
+      case 'pendiente':
         return <AlertTriangle className="w-5 h-5 text-gray-400" />;
-      case 'PAUSADA':
+      case 'pausada':
         return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
-      case 'CANCELADA':
+      case 'cancelada':
         return <X className="w-5 h-5 text-red-600" />;
       default:
         return <Clock className="w-5 h-5 text-gray-400" />;
     }
   };
 
+  // ✅ Usar datos reales de la API con fallbacks
+  const colorFase = fase.color || '#3B82F6';
+  const responsables = fase.responsables || [];
+  const entregables = fase.entregables || [];
+  const riesgos = fase.riesgos || [];
+
   return (
     <div className={`bg-white rounded-lg shadow-sm border-l-4 p-6 ${
       isAtrasada ? 'border-red-500 bg-red-50' : ''
-    }`} style={{ borderLeftColor: fase.color }}>
+    }`} style={{ borderLeftColor: colorFase }}>
       
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
-            {getEstadoIcon(fase.estado)}
+            {getEstadoIcon(fase.estadoDescriptivo)}
             <h3 className="text-lg font-semibold text-gray-900">{fase.nombre}</h3>
             <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">
-              #{fase.orden}
+              #{fase.orden || 'N/A'}
             </span>
-            <EstadoBadge estado={fase.estado} />
+            <EstadoBadge estado={fase.estadoDescriptivo} />
           </div>
           
-          <p className="text-gray-600 text-sm mb-3">{fase.descripcion}</p>
+          <p className="text-gray-600 text-sm mb-3">{fase.descripcion || 'Sin descripción'}</p>
 
           {isAtrasada && (
             <div className="flex items-center gap-1 text-red-600 text-sm mb-3">
@@ -330,8 +218,8 @@ function FaseCard({ fase, onEditar, onEliminar, onMoverArriba, onMoverAbajo, pue
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Calendar className="w-4 h-4" />
             <span>
-              {new Date(fase.fechaInicio).toLocaleDateString('es-ES')} - {' '}
-              {new Date(fase.fechaFinEstimada).toLocaleDateString('es-ES')}
+              {fase.fechaInicio ? new Date(fase.fechaInicio).toLocaleDateString('es-ES') : 'Sin fecha'} - {' '}
+              {fase.fechaFinEstimada ? new Date(fase.fechaFinEstimada).toLocaleDateString('es-ES') : 'Sin fecha'}
             </span>
           </div>
           
@@ -352,92 +240,113 @@ function FaseCard({ fase, onEditar, onEliminar, onMoverArriba, onMoverAbajo, pue
 
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Users className="w-4 h-4" />
-            <span>{fase.responsables.length} responsable(s)</span>
+            <span>{responsables.length} responsable(s)</span>
           </div>
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <BarChart3 className="w-4 h-4" />
-            <span>Presupuesto: ${fase.presupuestoUtilizado.toLocaleString()} / ${fase.presupuestoAsignado.toLocaleString()}</span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Target className="w-4 h-4" />
-            <span>Horas: {fase.horasReales}h / {fase.horasEstimadas}h</span>
-          </div>
-
-          <RiesgoIndicator riesgos={fase.riesgos} />
-        </div>
-      </div>
-
-      {/* Progreso */}
-      <div className="space-y-2 mb-4">
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Progreso de la fase</span>
-          <span className="font-medium">{fase.porcentajeAvance}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div 
-            className="h-3 rounded-full transition-all duration-300"
-            style={{ 
-              width: `${fase.porcentajeAvance}%`,
-              backgroundColor: fase.color
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Entregables */}
-      <div className="mb-4">
-        <h4 className="text-sm font-medium text-gray-900 mb-2">Entregables principales:</h4>
-        <div className="flex flex-wrap gap-2">
-          {fase.entregables.slice(0, 3).map((entregable, index) => (
-            <span key={index} className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">
-              {entregable}
-            </span>
-          ))}
-          {fase.entregables.length > 3 && (
-            <span className="inline-flex px-2 py-1 text-xs bg-gray-50 text-gray-500 rounded">
-              +{fase.entregables.length - 3} más
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Responsables */}
-      <div>
-        <h4 className="text-sm font-medium text-gray-900 mb-2">Equipo responsable:</h4>
-        <div className="flex flex-wrap gap-2">
-          {fase.responsables.map((responsable) => (
-            <div key={responsable.id} className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">
-              <Users className="w-3 h-3" />
-              <span>{responsable.nombre}</span>
+          {/* Presupuesto - mostrar solo si existe */}
+          {fase.presupuestoAsignado && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <BarChart3 className="w-4 h-4" />
+              <span>Presupuesto: ${(fase.presupuestoUtilizado || 0).toLocaleString()} / ${fase.presupuestoAsignado.toLocaleString()}</span>
             </div>
-          ))}
+          )}
+          
+          {/* Horas - mostrar solo si existe */}
+          {fase.horasEstimadas && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Target className="w-4 h-4" />
+              <span>Horas: {fase.horasReales || 0}h / {fase.horasEstimadas}h</span>
+            </div>
+          )}
+
+          <RiesgoIndicator riesgos={riesgos} />
         </div>
       </div>
+
+      {/* Progreso - mostrar solo si existe */}
+      {fase.porcentajeAvance !== undefined && (
+        <div className="space-y-2 mb-4">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-600">Progreso de la fase</span>
+            <span className="font-medium">{fase.porcentajeAvance || 0}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3">
+            <div 
+              className="h-3 rounded-full transition-all duration-300"
+              style={{ 
+                width: `${fase.porcentajeAvance || 0}%`,
+                backgroundColor: colorFase
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Entregables - mostrar solo si existen */}
+      {entregables.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-sm font-medium text-gray-900 mb-2">Entregables principales:</h4>
+          <div className="flex flex-wrap gap-2">
+            {entregables.slice(0, 3).map((entregable, index) => (
+              <span key={index} className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">
+                {entregable}
+              </span>
+            ))}
+            {entregables.length > 3 && (
+              <span className="inline-flex px-2 py-1 text-xs bg-gray-50 text-gray-500 rounded">
+                +{entregables.length - 3} más
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Responsables - mostrar solo si existen */}
+      {responsables.length > 0 && (
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 mb-2">Equipo responsable:</h4>
+          <div className="flex flex-wrap gap-2">
+            {responsables.map((responsable, index) => (
+              <div key={responsable.id || index} className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">
+                <Users className="w-3 h-3" />
+                <span>{responsable.nombre || responsable}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Notas - mostrar solo si existen */}
+      {fase.notas && (
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <h4 className="text-sm font-medium text-gray-900 mb-1">Notas:</h4>
+          <p className="text-sm text-gray-600">{fase.notas}</p>
+        </div>
+      )}
     </div>
   );
 }
 
-function FaseForm({ fase, onGuardar, onCancelar, recursos }) {
+function FaseForm({ fase, onGuardar, onCancelar, recursos, proyectoId }) {
   const [formData, setFormData] = useState({
     nombre: fase?.nombre || '',
     descripcion: fase?.descripcion || '',
-    fechaInicio: fase?.fechaInicio || '',
-    fechaFinEstimada: fase?.fechaFinEstimada || '',
-    estado: fase?.estado || 'PENDIENTE',
+    fechaInicio: fase?.fechaInicio ? fase.fechaInicio.split('T')[0] : '',
+    fechaFinEstimada: fase?.fechaFinEstimada ? fase.fechaFinEstimada.split('T')[0] : '',
+    estadoDescriptivo: fase?.estadoDescriptivo || 'Pendiente',
     color: fase?.color || '#3B82F6',
     presupuestoAsignado: fase?.presupuestoAsignado || '',
     horasEstimadas: fase?.horasEstimadas || '',
-    responsables: fase?.responsables?.map(r => r.id) || [],
-    entregables: fase?.entregables?.join('\n') || '',
+    responsables: fase?.responsables?.map(r => r.id || r) || [],
+    entregables: Array.isArray(fase?.entregables) ? fase.entregables.join('\n') : (fase?.entregables || ''),
     prerequisitos: fase?.prerequisitos || [],
     notas: fase?.notas || ''
   });
 
   const [errores, setErrores] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (campo, valor) => {
     setFormData(prev => ({
@@ -477,42 +386,43 @@ function FaseForm({ fase, onGuardar, onCancelar, recursos }) {
       nuevosErrores.fechaFinEstimada = 'La fecha de fin debe ser posterior a la de inicio';
     }
 
-    if (!formData.presupuestoAsignado || formData.presupuestoAsignado <= 0) {
-      nuevosErrores.presupuestoAsignado = 'El presupuesto debe ser mayor a 0';
-    }
-
-    if (!formData.horasEstimadas || formData.horasEstimadas <= 0) {
-      nuevosErrores.horasEstimadas = 'Las horas estimadas deben ser mayor a 0';
-    }
-
-    if (formData.responsables.length === 0) {
-      nuevosErrores.responsables = 'Debe asignar al menos un responsable';
-    }
-
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (validarFormulario()) {
+    if (!validarFormulario()) {
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      // ✅ Preparar datos según el formato esperado por la API
       const faseData = {
-        ...formData,
-        id: fase?.id || Date.now(),
-        orden: fase?.orden || 999,
-        porcentajeAvance: fase?.porcentajeAvance || 0,
-        presupuestoUtilizado: fase?.presupuestoUtilizado || 0,
-        horasReales: fase?.horasReales || 0,
-        fechaFinReal: fase?.fechaFinReal || null,
-        responsables: formData.responsables.map(id => 
-          recursos.find(r => r.id === parseInt(id))
-        ).filter(Boolean),
-        entregables: formData.entregables.split('\n').filter(e => e.trim()),
-        riesgos: fase?.riesgos || []
+        nombre: formData.nombre.trim(),
+        descripcion: formData.descripcion.trim(),
+        fechaInicio: formData.fechaInicio,
+        fechaFinEstimada: formData.fechaFinEstimada,
+        estadoDescriptivo: formData.estadoDescriptivo,
+        // TODO: Cuando la API soporte estos campos, descomentarlos:
+        // color: formData.color,
+        // presupuestoAsignado: formData.presupuestoAsignado,
+        // horasEstimadas: formData.horasEstimadas,
+        // responsables: formData.responsables,
+        // entregables: formData.entregables.split('\n').filter(e => e.trim()),
+        // notas: formData.notas
       };
+
+      await onGuardar(faseData);
       
-      onGuardar(faseData);
+    } catch (error) {
+      console.error('Error guardando fase:', error);
+      // TODO: Mostrar error al usuario
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -551,22 +461,23 @@ function FaseForm({ fase, onGuardar, onCancelar, recursos }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Color identificativo
+                Color identificativo (Próximamente)
               </label>
-              <div className="flex gap-2">
-                {coloresDisponibles.map((color) => (
+              <div className="flex gap-2 opacity-50">
+                {coloresDisponibles.slice(0, 4).map((color) => (
                   <button
                     key={color.valor}
                     type="button"
-                    onClick={() => handleChange('color', color.valor)}
-                    className={`w-8 h-8 rounded-full border-2 ${
+                    disabled
+                    className={`w-8 h-8 rounded-full border-2 cursor-not-allowed ${
                       formData.color === color.valor ? 'border-gray-800' : 'border-gray-300'
                     }`}
                     style={{ backgroundColor: color.valor }}
-                    title={color.nombre}
+                    title={`${color.nombre} (Próximamente)`}
                   />
                 ))}
               </div>
+              <p className="text-xs text-gray-500 mt-1">Funcionalidad en desarrollo</p>
             </div>
           </div>
 
@@ -629,117 +540,72 @@ function FaseForm({ fase, onGuardar, onCancelar, recursos }) {
                 Estado
               </label>
               <select
-                value={formData.estado}
-                onChange={(e) => handleChange('estado', e.target.value)}
+                value={formData.estadoDescriptivo}
+                onChange={(e) => handleChange('estadoDescriptivo', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
-                <option value="PENDIENTE">Pendiente</option>
-                <option value="EN_PROGRESO">En Progreso</option>
-                <option value="COMPLETADA">Completada</option>
-                <option value="PAUSADA">Pausada</option>
-                <option value="CANCELADA">Cancelada</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="En Progreso">En Progreso</option>
+                <option value="Completada">Completada</option>
+                <option value="Pausada">Pausada</option>
+                <option value="Cancelada">Cancelada</option>
               </select>
             </div>
           </div>
 
-          {/* Presupuesto y horas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Presupuesto asignado (USD) *
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={formData.presupuestoAsignado}
-                onChange={(e) => handleChange('presupuestoAsignado', parseInt(e.target.value))}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                  errores.presupuestoAsignado ? 'border-red-300' : 'border-gray-300'
-                }`}
-                placeholder="50000"
-              />
-              {errores.presupuestoAsignado && (
-                <p className="text-red-600 text-sm mt-1">{errores.presupuestoAsignado}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Horas estimadas *
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={formData.horasEstimadas}
-                onChange={(e) => handleChange('horasEstimadas', parseInt(e.target.value))}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                  errores.horasEstimadas ? 'border-red-300' : 'border-gray-300'
-                }`}
-                placeholder="200"
-              />
-              {errores.horasEstimadas && (
-                <p className="text-red-600 text-sm mt-1">{errores.horasEstimadas}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Responsables */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Responsables de la fase *
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {recursos.map((recurso) => (
-                <label key={recurso.id} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.responsables.includes(recurso.id)}
-                    onChange={(e) => {
-                      const nuevosResponsables = e.target.checked
-                        ? [...formData.responsables, recurso.id]
-                        : formData.responsables.filter(id => id !== recurso.id);
-                      handleChange('responsables', nuevosResponsables);
-                    }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {recurso.nombre} - {recurso.rol}
-                  </span>
+          {/* Campos adicionales - Deshabilitados temporalmente */}
+          <div className="space-y-4 opacity-50">
+            <h3 className="text-lg font-medium text-gray-700">Campos Adicionales (Próximamente)</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Presupuesto asignado (USD)
                 </label>
-              ))}
+                <input
+                  type="number"
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                  placeholder="50000"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Horas estimadas
+                </label>
+                <input
+                  type="number"
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                  placeholder="200"
+                />
+              </div>
             </div>
-            {errores.responsables && (
-              <p className="text-red-600 text-sm mt-1">{errores.responsables}</p>
-            )}
-          </div>
 
-          {/* Entregables */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Entregables principales
-            </label>
-            <textarea
-              value={formData.entregables}
-              onChange={(e) => handleChange('entregables', e.target.value)}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              placeholder="Documento de requerimientos&#10;Diseño de arquitectura&#10;Wireframes y mockups&#10;(Un entregable por línea)"
-            />
-            <p className="text-xs text-gray-500 mt-1">Escribe cada entregable en una línea separada</p>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Responsables de la fase
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {recursos.slice(0, 2).map((recurso) => (
+                  <label key={recurso.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      disabled
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 bg-gray-50"
+                    />
+                    <span className="text-sm text-gray-500">
+                      {recurso.nombre} - {recurso.rol}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
 
-          {/* Notas */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notas adicionales
-            </label>
-            <textarea
-              value={formData.notas}
-              onChange={(e) => handleChange('notas', e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              placeholder="Comentarios, consideraciones especiales, etc..."
-            />
+            <p className="text-sm text-gray-500">
+              Estos campos se habilitarán cuando estén listos en la API del backend
+            </p>
           </div>
 
           {/* Botones */}
@@ -747,15 +613,21 @@ function FaseForm({ fase, onGuardar, onCancelar, recursos }) {
             <button
               type="button"
               onClick={onCancelar}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              disabled={loading}
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
             >
-              <Save className="w-4 h-4" />
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
               {fase ? 'Actualizar' : 'Crear'} Fase
             </button>
           </div>
@@ -766,33 +638,37 @@ function FaseForm({ fase, onGuardar, onCancelar, recursos }) {
 }
 
 export default function FasesPanel({ proyectoId, onVolver }) {
-  const [fases, setFases] = useState([]);
+  // ✅ Usar hook real en lugar de mock data
+  const { fases, loading, error, cargarFases, crearFase, planificarFase } = useFases(proyectoId);
+  
   const [recursos, setRecursos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingRecursos, setLoadingRecursos] = useState(true);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [faseEditando, setFaseEditando] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState('');
 
+  // ✅ Cargar recursos independientemente
   useEffect(() => {
-    cargarDatos();
-  }, [proyectoId]);
+    cargarRecursos();
+  }, []);
 
-  const cargarDatos = async () => {
-    setLoading(true);
+  const cargarRecursos = async () => {
+    setLoadingRecursos(true);
     try {
-      // Simular llamada al backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setFases(mockFases.sort((a, b) => a.orden - b.orden));
+      // TODO: Reemplazar con API real cuando esté disponible
+      // const recursosData = await apiCall('/api/recursos');
+      await new Promise(resolve => setTimeout(resolve, 500));
       setRecursos(mockRecursos);
     } catch (error) {
-      console.error('Error cargando fases:', error);
+      console.error('Error cargando recursos:', error);
     } finally {
-      setLoading(false);
+      setLoadingRecursos(false);
     }
   };
 
+  // ✅ Filtrar fases según estado seleccionado
   const fasesFiltradas = fases.filter(fase => 
-    !filtroEstado || fase.estado === filtroEstado
+    !filtroEstado || fase.estadoDescriptivo === filtroEstado
   );
 
   const handleNuevaFase = () => {
@@ -806,73 +682,93 @@ export default function FasesPanel({ proyectoId, onVolver }) {
   };
 
   const handleEliminarFase = (fase) => {
-    const dependientes = fases.filter(f => f.prerequisitos.includes(fase.id));
+    // TODO: Implementar verificación de dependencias cuando esté disponible en la API
     
-    if (dependientes.length > 0) {
-      alert(`No se puede eliminar esta fase porque las siguientes fases dependen de ella: ${dependientes.map(f => f.nombre).join(', ')}`);
-      return;
-    }
-
     if (confirm(`¿Estás seguro de eliminar la fase "${fase.nombre}"? Esta acción no se puede deshacer.`)) {
-      setFases(prev => prev.filter(f => f.id !== fase.id));
+      // TODO: Implementar eliminación real cuando esté disponible en el hook
+      console.log('Eliminar fase:', fase.idFase);
+      // await eliminarFase(fase.idFase);
     }
   };
 
-  const handleGuardarFase = (faseData) => {
-    if (faseEditando) {
-      // Actualizar fase existente
-      setFases(prev => prev.map(f => 
-        f.id === faseEditando.id ? { ...faseData, id: faseEditando.id } : f
-      ));
-    } else {
-      // Crear nueva fase - asignar el siguiente orden
-      const maxOrden = Math.max(...fases.map(f => f.orden), 0);
-      const nuevaFase = { ...faseData, orden: maxOrden + 1 };
-      setFases(prev => [...prev, nuevaFase].sort((a, b) => a.orden - b.orden));
+  const handleGuardarFase = async (faseData) => {
+    try {
+      if (faseEditando) {
+        // TODO: Implementar actualización cuando esté disponible en el hook
+        // await actualizarFase(faseEditando.idFase, faseData);
+        console.log('Actualizar fase:', faseEditando.idFase, faseData);
+        
+        // Por ahora, simular actualización local
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } else {
+        // ✅ Crear nueva fase usando el hook real
+        await crearFase(faseData);
+      }
+      
+      setMostrarFormulario(false);
+      setFaseEditando(null);
+      
+      // ✅ Recargar fases
+      await cargarFases();
+      
+    } catch (error) {
+      console.error('Error guardando fase:', error);
+      // TODO: Mostrar error al usuario
     }
-    
-    setMostrarFormulario(false);
-    setFaseEditando(null);
   };
 
   const handleMoverFase = (fase, direccion) => {
-    const fasesOrdenadas = [...fases].sort((a, b) => a.orden - b.orden);
-    const indiceActual = fasesOrdenadas.findIndex(f => f.id === fase.id);
+    // TODO: Implementar reordenamiento cuando esté disponible en la API
+    console.log(`Mover fase ${fase.nombre} hacia ${direccion}`);
     
-    if (direccion === 'arriba' && indiceActual > 0) {
-      const faseAnterior = fasesOrdenadas[indiceActual - 1];
-      const nuevoOrden = fase.orden;
-      
-      setFases(prev => prev.map(f => {
-        if (f.id === fase.id) return { ...f, orden: faseAnterior.orden };
-        if (f.id === faseAnterior.id) return { ...f, orden: nuevoOrden };
-        return f;
-      }));
-    } else if (direccion === 'abajo' && indiceActual < fasesOrdenadas.length - 1) {
-      const faseSiguiente = fasesOrdenadas[indiceActual + 1];
-      const nuevoOrden = fase.orden;
-      
-      setFases(prev => prev.map(f => {
-        if (f.id === fase.id) return { ...f, orden: faseSiguiente.orden };
-        if (f.id === faseSiguiente.id) return { ...f, orden: nuevoOrden };
-        return f;
-      }));
+    // Por ahora, mostrar mensaje al usuario
+    alert('Funcionalidad de reordenamiento en desarrollo. Próximamente disponible.');
+  };
+
+  const handlePlanificarFase = async (fase, fechaInicio, fechaFin) => {
+    try {
+      // ✅ Usar función de planificación del hook
+      await planificarFase(fase.idFase, fechaInicio, fechaFin);
+      await cargarFases(); // Recargar para mostrar cambios
+    } catch (error) {
+      console.error('Error planificando fase:', error);
     }
   };
 
+  // ✅ Calcular estadísticas reales desde los datos de la API
   const calcularEstadisticasGenerales = () => {
+    if (!fases.length) {
+      return {
+        total: 0,
+        completadas: 0,
+        enProgreso: 0,
+        pendientes: 0,
+        progresoGeneral: 0,
+        presupuestoTotal: 0,
+        presupuestoUtilizado: 0,
+        porcentajePresupuesto: 0,
+        horasTotal: 0,
+        horasReales: 0,
+        porcentajeHoras: 0,
+        riesgosTotal: 0
+      };
+    }
+
     const total = fases.length;
-    const completadas = fases.filter(f => f.estado === 'COMPLETADA').length;
-    const enProgreso = fases.filter(f => f.estado === 'EN_PROGRESO').length;
-    const pendientes = fases.filter(f => f.estado === 'PENDIENTE').length;
+    const completadas = fases.filter(f => f.estadoDescriptivo === 'Completada').length;
+    const enProgreso = fases.filter(f => f.estadoDescriptivo === 'En Progreso').length;
+    const pendientes = fases.filter(f => f.estadoDescriptivo === 'Pendiente').length;
     
-    const presupuestoTotal = fases.reduce((sum, f) => sum + f.presupuestoAsignado, 0);
-    const presupuestoUtilizado = fases.reduce((sum, f) => sum + f.presupuestoUtilizado, 0);
+    // Calcular presupuesto solo si las fases tienen esa información
+    const presupuestoTotal = fases.reduce((sum, f) => sum + (f.presupuestoAsignado || 0), 0);
+    const presupuestoUtilizado = fases.reduce((sum, f) => sum + (f.presupuestoUtilizado || 0), 0);
     
-    const horasTotal = fases.reduce((sum, f) => sum + f.horasEstimadas, 0);
-    const horasReales = fases.reduce((sum, f) => sum + f.horasReales, 0);
+    // Calcular horas solo si las fases tienen esa información
+    const horasTotal = fases.reduce((sum, f) => sum + (f.horasEstimadas || 0), 0);
+    const horasReales = fases.reduce((sum, f) => sum + (f.horasReales || 0), 0);
     
-    const riesgosTotal = fases.reduce((sum, f) => sum + (f.riesgos?.length || 0), 0);
+    // Calcular riesgos
+    const riesgosTotal = fases.reduce((sum, f) => sum + ((f.riesgos && f.riesgos.length) || 0), 0);
 
     return {
       total,
@@ -892,7 +788,28 @@ export default function FasesPanel({ proyectoId, onVolver }) {
 
   const stats = calcularEstadisticasGenerales();
 
-  if (loading) {
+  // ✅ Manejo de errores
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 mb-4">
+            <AlertTriangle className="w-16 h-16 mx-auto" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error cargando fases</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={cargarFases}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading || loadingRecursos) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -977,9 +894,14 @@ export default function FasesPanel({ proyectoId, onVolver }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Presupuesto</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.porcentajePresupuesto}%</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {stats.presupuestoTotal > 0 ? `${stats.porcentajePresupuesto}%` : 'N/A'}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  ${stats.presupuestoUtilizado.toLocaleString()} / ${stats.presupuestoTotal.toLocaleString()}
+                  {stats.presupuestoTotal > 0 
+                    ? `${stats.presupuestoUtilizado.toLocaleString()} / ${stats.presupuestoTotal.toLocaleString()}`
+                    : 'Sin información de presupuesto'
+                  }
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-purple-50 text-purple-600">
@@ -1017,11 +939,11 @@ export default function FasesPanel({ proyectoId, onVolver }) {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             >
               <option value="">Todos los estados</option>
-              <option value="PENDIENTE">Pendiente</option>
-              <option value="EN_PROGRESO">En Progreso</option>
-              <option value="COMPLETADA">Completada</option>
-              <option value="PAUSADA">Pausada</option>
-              <option value="CANCELADA">Cancelada</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="En Progreso">En Progreso</option>
+              <option value="Completada">Completada</option>
+              <option value="Pausada">Pausada</option>
+              <option value="Cancelada">Cancelada</option>
             </select>
             
             <span className="text-sm text-gray-500 ml-auto">
@@ -1034,10 +956,10 @@ export default function FasesPanel({ proyectoId, onVolver }) {
         <div className="space-y-6">
           {fasesFiltradas.length > 0 ? (
             fasesFiltradas
-              .sort((a, b) => a.orden - b.orden)
+              .sort((a, b) => (a.orden || 0) - (b.orden || 0))
               .map((fase, index) => (
                 <FaseCard 
-                  key={fase.id}
+                  key={fase.idFase}
                   fase={fase}
                   recursos={recursos}
                   onEditar={handleEditarFase}
@@ -1080,6 +1002,7 @@ export default function FasesPanel({ proyectoId, onVolver }) {
         <FaseForm 
           fase={faseEditando}
           recursos={recursos}
+          proyectoId={proyectoId}
           onGuardar={handleGuardarFase}
           onCancelar={() => {
             setMostrarFormulario(false);
