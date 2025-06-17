@@ -1,14 +1,17 @@
 import TarjetaKanban from "@/components/Tickets/Kanban/TarjetaKanban";
+import Link from "next/link";
 
 export default function ColumnaKanban({ estado, tickets }) {
   const colores = {
-    Nuevo: "text-orange-600",
+    CREADO: "text-orange-600",
     "En Progreso": "text-blue-600",
-    Escalado: "text-red-600",
-    Resuelto: "text-green-600",
-    Cerrado: "text-gray-400",
+    ["EN PROGRESO"]: "text-red-600",
+    ["EN ESPERA DE INFORMACION"]: "text-green-600",
+    BLOQUEADO: "text-gray-400",
+    FINALIZADO: "text-purple-600",
+    CANCELADO: "text-gray-500",
+    RECHAZADO: "text-yellow-600",
   };
-
   return (
     <div className="bg-slate-50 rounded-md shadow-sm border-none  min-w-[15%] px-5">
       <div className="p-3 border-b-slate-400 font-semibold text-sm uppercase flex justify-between items-center">
@@ -18,7 +21,9 @@ export default function ColumnaKanban({ estado, tickets }) {
 
       <div className="p-2 space-y-3 w-full">
         {tickets.map((t) => (
-          <TarjetaKanban key={t.id} ticket={t} />
+          <Link href={`/Soporte/${t.internalId}`} key={t.internalId}>
+            <TarjetaKanban key={t.id} ticket={t} />
+          </Link>
         ))}
       </div>
     </div>

@@ -2,12 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { Fragment } from "react";
 import FormularioTicket from "@/components/Tickets/ModalNuevoTicket/FormularioNuevoTicket";
 
-export default function ModalNuevoTicket({
-  isOpen,
-  onClose,
-  onCrearTicket,
-  productoSeleccionado,
-}) {
+export default function ModalNuevoTicket({ isOpen, onClose }) {
   return (
     <Dialog open={isOpen} onClose={onClose} as={Fragment}>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -15,11 +10,7 @@ export default function ModalNuevoTicket({
           <Dialog.Title className="text-2xl font-semibold mb-4">
             Nuevo Ticket
           </Dialog.Title>
-          <FormularioTicket
-            onClose={onClose}
-            onCrearTicket={onCrearTicket}
-            productoSeleccionado={productoSeleccionado}
-          />
+          <FormularioTicket onClose={onClose} />
         </Dialog.Panel>
       </div>
     </Dialog>

@@ -1,28 +1,52 @@
-import { productos } from "@/api/mock/productosDatos";
-import { opciones } from "@/api/mock/opcionesSelect";
+"use client";
+import { getProductos } from "@/api/productos";
 import { useState } from "react";
-import { addTicket } from "@/api/tickets";
+import { getClientes, getResponsables } from "@/api/serviciosExternos";
+import { useEffect } from "react";
+import { addTicket, getMetadatos } from "@/api/tickets";
 
-export default function FormularioTicket({ onClose, onCrearTicket }) {
+export default function FormularioTicket({ onClose }) {
   const [form, setForm] = useState({
     nombre: "",
     prioridad: "",
     severidad: "",
-    cliente: "",
-    producto: "",
+    idCliente: "",
+    idProducto: "",
     version: "",
     descripcion: "",
+    idResponsable: "",
   });
 
+  const [clientes, setClientes] = useState([]);
+  const [responsables, setResponsables] = useState([]);
   const [showError, setShowError] = useState(false);
+  const [prioridadesMeta, setPrioridadesMeta] = useState([]);
+  const [severidadesMeta, setSeveridadesMeta] = useState([]);
+  const [productos, setProductos] = useState([]);
+
+  useEffect(() => {
+    getClientes().then(setClientes).catch(console.error);
+    getResponsables().then(setResponsables).catch(console.error);
+    getMetadatos()
+      .then((data) => {
+        setPrioridadesMeta(data.prioridades);
+        setSeveridadesMeta(data.severidades);
+      })
+      .catch(console.error);
+    getProductos()
+      .then((data) => {
+        setProductos(data);
+      })
+      .catch(console.error);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "producto") {
+    if (name === "idProducto") {
       setForm((prev) => ({
         ...prev,
-        producto: value,
+        idProducto: value,
         version: "",
       }));
     } else {
@@ -33,7 +57,7 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const estanTodosCompletos = Object.entries(form).every(
@@ -43,20 +67,20 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
     if (!estanTodosCompletos) {
       setShowError(true);
       setTimeout(() => setShowError(false), 2000);
+
       return;
     }
 
-    const nuevo = addTicket({
+    const nuevo = await addTicket({
       ...form,
-      custom: false,
     });
 
-    onCrearTicket(nuevo);
     onClose();
   };
 
-  const versionesDisponibles =
-    productos.find((p) => p.nombre === form.producto)?.versiones || [];
+  const productoSeleccionado = productos.find((p) => p.id === form.idProducto);
+
+  const versionesDisponibles = productoSeleccionado?.versiones || [];
 
   return (
     <form className="space-y-4 text-sm">
@@ -82,14 +106,22 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
         <div>
           <label className="font-semibold block mb-1">Producto:</label>
           <select
-            name="producto"
+            name="idProducto"
             className="border border-gray-300 rounded w-full px-2 py-1"
-            value={form.producto}
-            onChange={handleChange}
+            value={form.idProducto}
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              const producto = productos.find((p) => p.id === selectedId);
+              setForm((prev) => ({
+                ...prev,
+                idProducto: selectedId,
+                version: "",
+              }));
+            }}
           >
             <option value="">Seleccionar producto</option>
-            {productos.map((p, i) => (
-              <option key={i} value={p.nombre}>
+            {productos.map((p) => (
+              <option key={p.id} value={p.id}>
                 {p.nombre}
               </option>
             ))}
@@ -103,7 +135,7 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             className="border border-gray-300 rounded w-full px-2 py-1"
             value={form.version}
             onChange={handleChange}
-            disabled={!form.producto}
+            disabled={!form.idProducto}
           >
             <option value="">Seleccionar versión</option>
             {versionesDisponibles.map((v, idx) => (
@@ -123,9 +155,9 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             onChange={handleChange}
           >
             <option value="">Prioridad</option>
-            {opciones.prioridad.map((p, i) => (
-              <option key={i} value={p}>
-                {p}
+            {prioridadesMeta.map((p, i) => (
+              <option key={i} value={p.code}>
+                {p.label}
               </option>
             ))}
           </select>
@@ -140,9 +172,9 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             onChange={handleChange}
           >
             <option value="">Severidad</option>
-            {opciones.severidad.map((s, i) => (
-              <option key={i} value={s}>
-                {s}
+            {severidadesMeta.map((s, i) => (
+              <option key={i} value={s.code}>
+                {s.label}
               </option>
             ))}
           </select>
@@ -151,18 +183,36 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
         <div>
           <label className="font-semibold block mb-1">Cliente:</label>
           <select
-            name="cliente"
+            name="idCliente"
             className="border border-gray-300 rounded w-full px-2 py-1"
-            value={form.cliente}
+            value={form.idCliente}
             onChange={handleChange}
           >
             <option value="">Cliente</option>
-            <option value="AgroTech">AgroTech</option>
-            <option value="TextilSur">TextilSur</option>
+            {clientes.map((cli) => (
+              <option key={cli.id} value={cli.id}>
+                {cli["razon_social"]}
+              </option>
+            ))}
           </select>
         </div>
       </div>
-
+      <div>
+        <label className="font-semibold block mb-1">Responsable:</label>
+        <select
+          name="idResponsable"
+          className="border border-gray-300 rounded w-full px-2 py-1"
+          value={form.idResponsable}
+          onChange={handleChange}
+        >
+          <option value="">Responsable</option>
+          {responsables.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.nombre} {r.apellido}
+            </option>
+          ))}
+        </select>
+      </div>
       <div>
         <label className="font-semibold block mb-1">Descripción:</label>
         <textarea
