@@ -1,59 +1,46 @@
-// src/api/hooks.js
-'use client'; // Para Next.js 13+ con app directory
+'use client';
 
 import { useState, useEffect } from 'react';
-import { portafolioAPI, proyectoAPI, faseAPI, tareaAPI, riesgoAPI } from './proyectos';
+import { apiCall } from './config';
 
 // ========================================
-// HOOK PARA PORTAFOLIO COMPLETO
+// HOOK SIMPLE PARA PROYECTOS (SIN PORTAFOLIO)
 // ========================================
 
-export const usePortafolio = () => {
-  const [estadisticas, setEstadisticas] = useState(null);
+export const useProyectos = () => {
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const cargarDatos = async () => {
+  const cargarProyectos = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // Usar solo estadísticas por ahora (funciona bien)
-      const statsData = await portafolioAPI.obtenerEstadisticas();
-      setEstadisticas(statsData);
-      
-      // Comentamos temporalmente la carga de proyectos hasta arreglar el JSON
-      // const proyectosData = await portafolioAPI.obtenerProyectos();
-      // setProyectos(proyectosData);
-      
-      // Datos mock temporales para mostrar que funciona
-      setProyectos([
-        {
-          idProyecto: 4,
-          nombre: "Proyecto de Prueba Frontend",
-          estado: "ACTIVO",
-          liderProyecto: "Frontend Developer",
-          descripcion: "Proyecto creado desde Next.js"
-        }
-      ]);
+      // ✅ Usar endpoint real que SÍ existe
+      const proyectosData = await apiCall('/api/proyectos');
+      setProyectos(proyectosData);
       
     } catch (err) {
       setError(err.message);
-      console.error('Error cargando portafolio:', err);
+      console.error('Error cargando proyectos:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    cargarDatos();
+    cargarProyectos();
   }, []);
 
   const crearProyecto = async (proyecto) => {
     try {
-      const nuevoProyecto = await portafolioAPI.crearProyecto(proyecto);
-      await cargarDatos(); // Recargar todo
+      // ✅ Usar endpoint real
+      const nuevoProyecto = await apiCall('/api/proyectos', {
+        method: 'POST',
+        body: JSON.stringify(proyecto),
+      });
+      await cargarProyectos(); // Recargar lista
       return nuevoProyecto;
     } catch (err) {
       setError(err.message);
@@ -63,8 +50,10 @@ export const usePortafolio = () => {
 
   const eliminarProyecto = async (id) => {
     try {
-      await portafolioAPI.eliminarProyecto(id);
-      await cargarDatos(); // Recargar todo
+      await apiCall(`/api/proyectos/${id}`, {
+        method: 'DELETE',
+      });
+      await cargarProyectos(); // Recargar lista
     } catch (err) {
       setError(err.message);
       throw err;
@@ -72,11 +61,10 @@ export const usePortafolio = () => {
   };
 
   return {
-    estadisticas,
     proyectos,
     loading,
     error,
-    cargarDatos,
+    cargarProyectos,
     crearProyecto,
     eliminarProyecto,
   };
@@ -100,8 +88,8 @@ export const useProyecto = (id) => {
       setError(null);
       
       const [proyectoData, statsData] = await Promise.all([
-        proyectoAPI.obtenerPorId(id),
-        proyectoAPI.obtenerEstadisticas(id),
+        apiCall(`/api/proyectos/${id}`),
+        apiCall(`/api/proyectos/${id}/estadisticas`),
       ]);
       
       setProyecto(proyectoData);
@@ -120,7 +108,10 @@ export const useProyecto = (id) => {
 
   const cambiarEstado = async (nuevoEstado) => {
     try {
-      const proyectoActualizado = await proyectoAPI.cambiarEstado(id, nuevoEstado);
+      const proyectoActualizado = await apiCall(`/api/proyectos/${id}/estado`, {
+        method: 'PUT',
+        body: JSON.stringify({ estado: nuevoEstado }),
+      });
       setProyecto(proyectoActualizado);
       await cargarProyecto(); // Recargar estadísticas
       return proyectoActualizado;
@@ -132,7 +123,10 @@ export const useProyecto = (id) => {
 
   const planificar = async (fechaInicio, fechaFin) => {
     try {
-      const proyectoActualizado = await proyectoAPI.planificar(id, fechaInicio, fechaFin);
+      const proyectoActualizado = await apiCall(`/api/proyectos/${id}/planificar`, {
+        method: 'PUT',
+        body: JSON.stringify({ fechaInicio, fechaFin }),
+      });
       setProyecto(proyectoActualizado);
       return proyectoActualizado;
     } catch (err) {
@@ -167,7 +161,7 @@ export const useFases = (proyectoId) => {
     try {
       setLoading(true);
       setError(null);
-      const fasesData = await faseAPI.obtenerPorProyecto(proyectoId);
+      const fasesData = await apiCall(`/api/proyectos/${proyectoId}/fases`);
       setFases(fasesData);
     } catch (err) {
       setError(err.message);
@@ -183,7 +177,10 @@ export const useFases = (proyectoId) => {
 
   const crearFase = async (fase) => {
     try {
-      const nuevaFase = await faseAPI.crear(proyectoId, fase);
+      const nuevaFase = await apiCall(`/api/proyectos/${proyectoId}/fases`, {
+        method: 'POST',
+        body: JSON.stringify(fase),
+      });
       await cargarFases(); // Recargar
       return nuevaFase;
     } catch (err) {
@@ -194,7 +191,10 @@ export const useFases = (proyectoId) => {
 
   const planificarFase = async (faseId, fechaInicio, fechaFin) => {
     try {
-      const faseActualizada = await faseAPI.planificar(faseId, fechaInicio, fechaFin);
+      const faseActualizada = await apiCall(`/api/proyectos/fases/${faseId}/planificar`, {
+        method: 'PUT',
+        body: JSON.stringify({ fechaInicio, fechaFin }),
+      });
       await cargarFases(); // Recargar
       return faseActualizada;
     } catch (err) {
@@ -229,8 +229,8 @@ export const useTareas = () => {
       setError(null);
       
       const [vencidas, multifase] = await Promise.all([
-        tareaAPI.obtenerVencidas(),
-        tareaAPI.obtenerMultifase(),
+        apiCall('/api/proyectos/tareas/vencidas'),
+        apiCall('/api/proyectos/tareas/multifase'),
       ]);
       
       setTareasVencidas(vencidas);
@@ -245,7 +245,10 @@ export const useTareas = () => {
 
   const crearTarea = async (tarea) => {
     try {
-      const nuevaTarea = await tareaAPI.crear(tarea);
+      const nuevaTarea = await apiCall('/api/proyectos/tareas', {
+        method: 'POST',
+        body: JSON.stringify(tarea),
+      });
       return nuevaTarea;
     } catch (err) {
       setError(err.message);
@@ -255,7 +258,10 @@ export const useTareas = () => {
 
   const asignarTareaAFase = async (tareaId, faseId) => {
     try {
-      const tareaActualizada = await tareaAPI.asignarAFase(tareaId, faseId);
+      const tareaActualizada = await apiCall(`/api/proyectos/tareas/${tareaId}/asignar-fase`, {
+        method: 'PUT',
+        body: JSON.stringify({ faseId }),
+      });
       return tareaActualizada;
     } catch (err) {
       setError(err.message);
@@ -265,7 +271,9 @@ export const useTareas = () => {
 
   const iniciarTarea = async (tareaId) => {
     try {
-      const tareaActualizada = await tareaAPI.iniciar(tareaId);
+      const tareaActualizada = await apiCall(`/api/proyectos/tareas/${tareaId}/iniciar`, {
+        method: 'PUT',
+      });
       return tareaActualizada;
     } catch (err) {
       setError(err.message);
@@ -275,7 +283,9 @@ export const useTareas = () => {
 
   const completarTarea = async (tareaId) => {
     try {
-      const tareaActualizada = await tareaAPI.completar(tareaId);
+      const tareaActualizada = await apiCall(`/api/proyectos/tareas/${tareaId}/completar`, {
+        method: 'PUT',
+      });
       return tareaActualizada;
     } catch (err) {
       setError(err.message);
@@ -314,8 +324,8 @@ export const useRiesgos = (proyectoId) => {
       setError(null);
       
       const [riesgosProyecto, riesgosAltosData] = await Promise.all([
-        riesgoAPI.obtenerPorProyecto(proyectoId),
-        riesgoAPI.obtenerAltos(),
+        apiCall(`/api/proyectos/${proyectoId}/riesgos`),
+        apiCall('/api/proyectos/riesgos/altos'),
       ]);
       
       setRiesgos(riesgosProyecto);
@@ -330,7 +340,10 @@ export const useRiesgos = (proyectoId) => {
 
   const crearRiesgo = async (riesgo) => {
     try {
-      const nuevoRiesgo = await riesgoAPI.crear(proyectoId, riesgo);
+      const nuevoRiesgo = await apiCall(`/api/proyectos/${proyectoId}/riesgos`, {
+        method: 'POST',
+        body: JSON.stringify(riesgo),
+      });
       await cargarRiesgos(); // Recargar
       return nuevoRiesgo;
     } catch (err) {
@@ -341,7 +354,9 @@ export const useRiesgos = (proyectoId) => {
 
   const mitigarRiesgo = async (riesgoId) => {
     try {
-      const riesgoActualizado = await riesgoAPI.mitigar(riesgoId);
+      const riesgoActualizado = await apiCall(`/api/proyectos/riesgos/${riesgoId}/mitigar`, {
+        method: 'PUT',
+      });
       await cargarRiesgos(); // Recargar
       return riesgoActualizado;
     } catch (err) {
@@ -371,7 +386,8 @@ export const useTestAPI = () => {
 
   const probarConexion = async () => {
     try {
-      await portafolioAPI.obtenerEstadisticas();
+      // ✅ Probar endpoint real que existe
+      await apiCall('/api/proyectos');
       setConnectionStatus('connected');
       setMensaje('✅ Conexión exitosa con el backend');
       return true;
@@ -390,7 +406,11 @@ export const useTestAPI = () => {
         liderProyecto: 'Frontend Developer',
       };
       
-      const resultado = await portafolioAPI.crearProyecto(proyecto);
+      // ✅ Usar endpoint real
+      const resultado = await apiCall('/api/proyectos', {
+        method: 'POST',
+        body: JSON.stringify(proyecto),
+      });
       setMensaje(`✅ Proyecto "${resultado.nombre}" creado con ID: ${resultado.idProyecto}`);
       return resultado;
     } catch (error) {

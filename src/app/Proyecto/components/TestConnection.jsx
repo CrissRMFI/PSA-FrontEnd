@@ -1,11 +1,10 @@
-// src/app/Proyecto/components/TestConnection.jsx
 'use client';
 
 import React from 'react';
-import { usePortafolio, useTestAPI } from '../../../api/hooks';
+import { useProyectos, useTestAPI } from '../../../api/hooks';
 
 const TestConnection = () => {
-  const { estadisticas, proyectos, loading, error, crearProyecto } = usePortafolio();
+  const { proyectos, loading, error, crearProyecto } = useProyectos();
   const { connectionStatus, mensaje, crearProyectoPrueba } = useTestAPI();
 
   const handleCrearProyecto = async () => {
@@ -21,6 +20,18 @@ const TestConnection = () => {
       console.error('Error:', error);
     }
   };
+
+  // Calcular estadísticas simples del lado del cliente
+  const estadisticas = React.useMemo(() => {
+    if (!proyectos.length) return null;
+    
+    return {
+      totalProyectos: proyectos.length,
+      proyectosActivos: proyectos.filter(p => p.estado === 'ACTIVO').length,
+      totalFases: proyectos.reduce((total, p) => total + (p.fases?.length || 0), 0),
+      totalRiesgos: proyectos.reduce((total, p) => total + (p.riesgos?.length || 0), 0),
+    };
+  }, [proyectos]);
 
   return (
     <div style={{ padding: '20px', fontFamily: 'system-ui' }}>
@@ -53,13 +64,13 @@ const TestConnection = () => {
         <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
           <strong>Next.js</strong> → <strong>APIs REST</strong> → <strong>Spring Boot</strong> → <strong>PostgreSQL (Render)</strong>
           <br />
-          <em>Tu GerenteProyecto y GerentePortafolio funcionando en la nube</em>
+          <em>Tu GerenteProyecto funcionando en la nube (sin portafolios)</em>
         </div>
       </div>
 
       {/* Estadísticas */}
       <div style={{ marginBottom: '20px' }}>
-        <h3>📊 Estadísticas del Portafolio</h3>
+        <h3>📊 Estadísticas de Proyectos</h3>
         {loading && <p>🔄 Cargando desde PostgreSQL...</p>}
         {error && <p style={{ color: 'red' }}>❌ Error: {error}</p>}
         {estadisticas && (
@@ -85,21 +96,15 @@ const TestConnection = () => {
             </div>
             <div style={{ textAlign: 'center', padding: '10px', backgroundColor: 'white', borderRadius: '6px' }}>
               <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#ffc107' }}>
-                {estadisticas.totalTareas}
+                {estadisticas.totalFases}
               </div>
-              <div>Total Tareas</div>
+              <div>Total Fases</div>
             </div>
             <div style={{ textAlign: 'center', padding: '10px', backgroundColor: 'white', borderRadius: '6px' }}>
               <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#dc3545' }}>
-                {estadisticas.riesgosActivos}
+                {estadisticas.totalRiesgos}
               </div>
-              <div>Riesgos Activos</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '10px', backgroundColor: 'white', borderRadius: '6px' }}>
-              <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#6f42c1' }}>
-                {estadisticas.porcentajeAvancePortafolio?.toFixed(1)}%
-              </div>
-              <div>% Avance</div>
+              <div>Total Riesgos</div>
             </div>
           </div>
         )}
@@ -145,6 +150,10 @@ const TestConnection = () => {
                 </div>
                 <div style={{ fontSize: '14px', color: '#666', marginBottom: '5px' }}>
                   <strong>ID:</strong> {proyecto.idProyecto} | <strong>Líder:</strong> {proyecto.liderProyecto}
+                </div>
+                <div style={{ fontSize: '13px', color: '#666' }}>
+                  <strong>Fases:</strong> {proyecto.fases?.length || 0} | 
+                  <strong> Riesgos:</strong> {proyecto.riesgos?.length || 0}
                 </div>
                 {proyecto.descripcion && (
                   <div style={{ fontSize: '13px', color: '#888', fontStyle: 'italic' }}>
@@ -224,7 +233,7 @@ const TestConnection = () => {
           <li><strong>Backend:</strong> Spring Boot corriendo en <code>localhost:8080</code></li>
           <li><strong>Frontend:</strong> Next.js corriendo en <code>localhost:3000</code></li>
           <li><strong>Base de Datos:</strong> PostgreSQL en Render (nube)</li>
-          <li><strong>APIs:</strong> 20+ endpoints funcionando con tu lógica de GerenteProyecto</li>
+          <li><strong>APIs:</strong> Endpoints de proyectos funcionando directamente</li>
           <li><strong>Datos:</strong> Todo lo que crees se guarda en la base de datos real</li>
         </ul>
         
@@ -239,7 +248,7 @@ const TestConnection = () => {
             Una vez que veas que esto funciona, podemos conectar tus componentes reales:
           </p>
           <ul style={{ fontSize: '14px', margin: '10px 0 0 20px' }}>
-            <li><code>ProyectoDashboard.jsx</code> → usar <code>usePortafolio()</code></li>
+            <li><code>ProyectoDashboard.jsx</code> → usar <code>useProyectos()</code></li>
             <li><code>ProyectoDetalle.jsx</code> → usar <code>useProyecto(id)</code></li>
             <li><code>FasesPanel.jsx</code> → usar <code>useFases(proyectoId)</code></li>
             <li><code>TareasManager.jsx</code> → usar <code>useTareas()</code></li>
