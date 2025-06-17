@@ -3,6 +3,7 @@ import { useState, useEffect, use } from "react";
 import { getMetadatos } from "@/api/tickets";
 
 export default function KanbanVista({ tickets }) {
+  console.log(tickets);
   const [metadatos, setMetadatos] = useState({
     estados: [],
     prioridades: [],
@@ -19,7 +20,9 @@ export default function KanbanVista({ tickets }) {
 
   const ticketsPorEstado = metadatos.estados.map((estado) => ({
     estado: estado.label,
-    tickets: tickets.filter((t) => t.estado === estado.label.toLowerCase()),
+    tickets: tickets.filter(
+      (t) => t.estadoLabel.toLowerCase() === estado.label.toLowerCase()
+    ),
   }));
 
   return (

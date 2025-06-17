@@ -15,7 +15,7 @@ export default function SoportePage() {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="p-10">
+    <div className="p-10 mb-20">
       <h2 className="text-4xl text-slate-500 mb-10">Soporte / Productos</h2>
 
       <div className="my-5">

@@ -53,6 +53,7 @@ export default function TicketContainer({ producto, version }) {
     clientes,
     responsables
   );
+  console.log(ticketsConNombres);
 
   return (
     <>

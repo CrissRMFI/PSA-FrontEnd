@@ -11,7 +11,6 @@ export default function ColumnaKanban({ estado, tickets }) {
     CANCELADO: "text-gray-500",
     RECHAZADO: "text-yellow-600",
   };
-
   return (
     <div className="bg-slate-50 rounded-md shadow-sm border-none  min-w-[15%] px-5">
       <div className="p-3 border-b-slate-400 font-semibold text-sm uppercase flex justify-between items-center">
