@@ -1,10 +1,9 @@
 "use client";
 import { productos } from "@/api/mock/productosDatos";
-import { opciones } from "@/api/mock/opcionesSelect";
 import { useState } from "react";
-import { addTicket } from "@/api/tickets";
 import { getClientes, getResponsables } from "@/api/serviciosExternos";
 import { useEffect } from "react";
+import { addTicket, prioridades, severidades } from "@/api/tickets";
 
 export default function FormularioTicket({ onClose, onCrearTicket }) {
   const [form, setForm] = useState({
@@ -64,8 +63,6 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
     onCrearTicket(nuevo);
     onClose();
   };
-
-  console.log(clientes);
 
   const productoSeleccionado = productos.find((p) => p.id === form.idProducto);
 
@@ -144,9 +141,9 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             onChange={handleChange}
           >
             <option value="">Prioridad</option>
-            {opciones.prioridad.map((p, i) => (
-              <option key={i} value={p}>
-                {p}
+            {prioridades.map((p, i) => (
+              <option key={i} value={p.value}>
+                {p.label}
               </option>
             ))}
           </select>
@@ -161,9 +158,9 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             onChange={handleChange}
           >
             <option value="">Severidad</option>
-            {opciones.severidad.map((s, i) => (
-              <option key={i} value={s}>
-                {s}
+            {severidades.map((s, i) => (
+              <option key={i} value={s.value}>
+                {s.label}
               </option>
             ))}
           </select>
