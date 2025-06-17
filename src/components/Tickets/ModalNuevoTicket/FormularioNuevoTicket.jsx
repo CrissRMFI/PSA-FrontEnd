@@ -3,12 +3,7 @@ import { getProductos } from "@/api/productos";
 import { useState } from "react";
 import { getClientes, getResponsables } from "@/api/serviciosExternos";
 import { useEffect } from "react";
-import {
-  addTicket,
-  prioridades,
-  severidades,
-  getMetadatos,
-} from "@/api/tickets";
+import { addTicket, getMetadatos } from "@/api/tickets";
 
 export default function FormularioTicket({ onClose }) {
   const [form, setForm] = useState({
@@ -163,7 +158,7 @@ export default function FormularioTicket({ onClose }) {
           >
             <option value="">Prioridad</option>
             {prioridadesMeta.map((p, i) => (
-              <option key={i} value={p.value}>
+              <option key={i} value={p.code}>
                 {p.label}
               </option>
             ))}
@@ -180,7 +175,7 @@ export default function FormularioTicket({ onClose }) {
           >
             <option value="">Severidad</option>
             {severidadesMeta.map((s, i) => (
-              <option key={i} value={s.value}>
+              <option key={i} value={s.code}>
                 {s.label}
               </option>
             ))}
