@@ -17,7 +17,6 @@ export default function ModalNuevoTicket({
           </Dialog.Title>
           <FormularioTicket
             onClose={onClose}
-            onCrearTicket={onCrearTicket}
             productoSeleccionado={productoSeleccionado}
           />
         </Dialog.Panel>

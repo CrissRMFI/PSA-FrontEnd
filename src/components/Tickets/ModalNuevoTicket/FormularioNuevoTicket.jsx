@@ -10,7 +10,7 @@ import {
   getMetadatos,
 } from "@/api/tickets";
 
-export default function FormularioTicket({ onClose, onCrearTicket }) {
+export default function FormularioTicket({ onClose }) {
   const [form, setForm] = useState({
     nombre: "",
     prioridad: "",
@@ -62,7 +62,7 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const estanTodosCompletos = Object.entries(form).every(
@@ -72,14 +72,16 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
     if (!estanTodosCompletos) {
       setShowError(true);
       setTimeout(() => setShowError(false), 2000);
+
       return;
     }
 
-    const nuevo = addTicket({
+    console.log("como estan completos", form);
+
+    const nuevo = await addTicket({
       ...form,
     });
 
-    onCrearTicket(nuevo);
     onClose();
   };
 

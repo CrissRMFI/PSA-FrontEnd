@@ -7,6 +7,7 @@ export const getTickets = async () => {
 };
 
 export const addTicket = async (ticket) => {
+  console.log(ticket);
   const res = await fetch(BASE_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -93,10 +93,6 @@ export default function SoportePage() {
             <ModalNuevoTicket
               isOpen={modalOpen}
               onClose={() => setModalOpen(false)}
-              onCrearTicket={(nuevo) => {
-                setTickets((prev) => [...prev, nuevo]);
-                setModalOpen(false);
-              }}
               productoSeleccionado={productoSeleccionado}
             />
           )}
