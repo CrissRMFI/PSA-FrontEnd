@@ -8,8 +8,6 @@ export default function SeleccionadorVersion({
 }) {
   if (!producto) return null;
 
-  console.log(producto);
-
   const [productos, setProductos] = useState([]);
 
   useEffect(() => {
