@@ -1,5 +1,5 @@
 const BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/ticket`;
-
+console.log(BASE_URL);
 export const getTickets = async () => {
   const res = await fetch(BASE_URL);
   if (!res.ok) throw new Error("Error al obtener tickets");
