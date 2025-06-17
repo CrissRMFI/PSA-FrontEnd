@@ -1,7 +1,27 @@
 "use client";
-import { opciones } from "@/api/mock/opcionesSelect";
+import { getMetadatos } from "@/api/tickets";
+import { useEffect, useState } from "react";
 
 export default function Filtros({ filtros, setFiltros }) {
+  const [prioridades, setPrioridades] = useState([]);
+  const [severidades, setSeveridades] = useState([]);
+  const [estados, setEstados] = useState([]);
+
+  useEffect(() => {
+    getMetadatos()
+      .then((data) => {
+        setPrioridades(data.prioridades);
+        setSeveridades(data.severidades);
+        setEstados(data.estados);
+      })
+      .catch((error) => {
+        console.error("Error al obtener metadatos:", error);
+        setPrioridades([]);
+        setSeveridades([]);
+        setEstados([]);
+      });
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFiltros((prev) => ({
@@ -19,9 +39,9 @@ export default function Filtros({ filtros, setFiltros }) {
         className="border border-gray-300 rounded px-2 py-1 text-md text-center"
       >
         <option value="">Severidad</option>
-        {opciones.severidad.map((sev, idx) => (
-          <option key={idx} value={sev}>
-            {sev}
+        {severidades.map((sev, idx) => (
+          <option key={idx} value={sev.code}>
+            {sev.label}
           </option>
         ))}
       </select>
@@ -33,9 +53,9 @@ export default function Filtros({ filtros, setFiltros }) {
         className="border border-gray-300 rounded px-2 py-1 text-md text-center"
       >
         <option value="">Prioridad</option>
-        {opciones.prioridad.map((pr, idx) => (
-          <option key={idx} value={pr}>
-            {pr}
+        {prioridades.map((pr, idx) => (
+          <option key={idx} value={pr.code}>
+            {pr.label}
           </option>
         ))}
       </select>
@@ -47,23 +67,9 @@ export default function Filtros({ filtros, setFiltros }) {
         className="border border-gray-300 rounded px-2 py-1 text-md text-center"
       >
         <option value="">Estado</option>
-        {opciones.estado.map((st, idx) => (
-          <option key={idx} value={st}>
-            {st}
-          </option>
-        ))}
-      </select>
-
-      <select
-        name="sla"
-        value={filtros.sla}
-        onChange={handleChange}
-        className="border border-gray-300 rounded px-2 py-1 text-md text-center"
-      >
-        <option value="">% SLA</option>
-        {opciones.sla.map((sl, idx) => (
-          <option key={idx} value={sl}>
-            {sl}
+        {estados.map((st, idx) => (
+          <option key={idx} value={st.code}>
+            {st.label}
           </option>
         ))}
       </select>

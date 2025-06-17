@@ -3,7 +3,12 @@ import { productos } from "@/api/mock/productosDatos";
 import { useState } from "react";
 import { getClientes, getResponsables } from "@/api/serviciosExternos";
 import { useEffect } from "react";
-import { addTicket, prioridades, severidades } from "@/api/tickets";
+import {
+  addTicket,
+  prioridades,
+  severidades,
+  getMetadatos,
+} from "@/api/tickets";
 
 export default function FormularioTicket({ onClose, onCrearTicket }) {
   const [form, setForm] = useState({
@@ -20,10 +25,19 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
   const [clientes, setClientes] = useState([]);
   const [responsables, setResponsables] = useState([]);
   const [showError, setShowError] = useState(false);
+  const [prioridadesMeta, setPrioridadesMeta] = useState([]);
+  const [severidadesMeta, setSeveridadesMeta] = useState([]);
 
   useEffect(() => {
     getClientes().then(setClientes).catch(console.error);
     getResponsables().then(setResponsables).catch(console.error);
+    getMetadatos()
+      .then((data) => {
+        console.log("Metadatos:", data);
+        setPrioridadesMeta(data.prioridades);
+        setSeveridadesMeta(data.severidades);
+      })
+      .catch(console.error);
   }, []);
 
   const handleChange = (e) => {
@@ -141,7 +155,7 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             onChange={handleChange}
           >
             <option value="">Prioridad</option>
-            {prioridades.map((p, i) => (
+            {prioridadesMeta.map((p, i) => (
               <option key={i} value={p.value}>
                 {p.label}
               </option>
@@ -158,7 +172,7 @@ export default function FormularioTicket({ onClose, onCrearTicket }) {
             onChange={handleChange}
           >
             <option value="">Severidad</option>
-            {severidades.map((s, i) => (
+            {severidadesMeta.map((s, i) => (
               <option key={i} value={s.value}>
                 {s.label}
               </option>
