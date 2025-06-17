@@ -3,7 +3,7 @@ import FilaTicket from "./FilaTicket";
 export default function TablaTickets({ tickets }) {
   const headers = [
     "ID",
-    "Nombre",
+    "Titulo",
     "Cliente",
     "Responsable",
     "Estado",
