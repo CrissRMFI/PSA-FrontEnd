@@ -1,8 +1,9 @@
 const BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/ticket`;
 
-export const getTickets = async () => {
-  const res = await fetch(BASE_URL);
-  if (!res.ok) throw new Error("Error al obtener tickets");
+export const getTicketsFiltrados = async ({ idProducto, version }) => {
+  const query = new URLSearchParams({ idProducto, version }).toString();
+  const res = await fetch(`${BASE_URL}/filtrados?${query}`);
+  if (!res.ok) throw new Error("Error al obtener tickets filtrados");
   return await res.json();
 };
 

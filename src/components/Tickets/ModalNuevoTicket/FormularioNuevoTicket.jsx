@@ -71,8 +71,6 @@ export default function FormularioTicket({ onClose }) {
       return;
     }
 
-    console.log("como estan completos", form);
-
     const nuevo = await addTicket({
       ...form,
     });

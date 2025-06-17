@@ -8,6 +8,7 @@ export default function FilaTicket({ ticket }) {
       <td className="px-4 py-3 text-center">{ticket.id}</td>
       <td className="px-4 py-3 text-center">{ticket.nombre}</td>
       <td className="px-4 py-3 text-center">{ticket.cliente}</td>
+      <td className="px-4 py-3 text-center">{ticket.responsable}</td>
       <td className="px-4 py-3 font-extrabold text-center">
         <Estado estado={ticket.estado} />
       </td>
