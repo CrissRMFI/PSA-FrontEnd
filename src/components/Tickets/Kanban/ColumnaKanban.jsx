@@ -1,7 +1,6 @@
 import TarjetaKanban from "@/components/Tickets/Kanban/TarjetaKanban";
 
 export default function ColumnaKanban({ estado, tickets }) {
-  console.log(estado);
   const colores = {
     CREADO: "text-orange-600",
     "En Progreso": "text-blue-600",
