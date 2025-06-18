@@ -1,4 +1,4 @@
-const BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/ticket`;
+const BASE_URL = `${process.env.SUPPORT_MODULE_BACKEND_URL}/ticket`;
 
 export const getTicketsFiltrados = async ({ idProducto, version }) => {
   const query = new URLSearchParams({ idProducto, version }).toString();
@@ -22,7 +22,7 @@ export const addTicket = async (ticket) => {
   return await res.text();
 };
 
-const BASE_METADATOS = `${process.env.NEXT_PUBLIC_SERVICIOS_METADATOS}`;
+const BASE_METADATOS = `${process.env.SUPPORT_MODULE_BACKEND_URL}/metadatos`;
 
 export const getMetadatos = async () => {
   const res = await fetch(`${BASE_METADATOS}`);
@@ -32,7 +32,7 @@ export const getMetadatos = async () => {
 
 export const getTicketById = async (id) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/ticket/${id}`
+    `${process.env.SUPPORT_MODULE_BACKEND_URL}/ticket/${id}`
   );
   if (!res.ok) throw new Error("Error al obtener el ticket");
   return res.json();
