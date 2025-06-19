@@ -23,18 +23,14 @@ export default function TicketContainer({ producto, version }) {
     estado: "",
   });
 
-  /*
   const ticketsFiltrados = tickets.filter((ticket) => {
     return (
-      ticket.idProducto === producto &&
-      ticket.version === version &&
-      (filtros.severidad === "" || ticket.severidad === filtros.severidad) &&
-      (filtros.prioridad === "" || ticket.prioridad === filtros.prioridad) &&
-      (filtros.estado === "" || ticket.estado === filtros.estado)
+      (filtros.severidad === "" || ticket.severidad == filtros.severidad) &&
+      (filtros.prioridad === "" || ticket.prioridad == filtros.prioridad) &&
+      (filtros.estado === "" || ticket.estado == filtros.estado)
     );
   });
-  */
- const ticketsFiltrados = tickets;
+ //const ticketsFiltrados = tickets;
 
 
 
