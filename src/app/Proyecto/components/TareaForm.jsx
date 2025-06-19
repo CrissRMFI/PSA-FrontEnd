@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import RecursoSelector from './RecursoSelector';
 
 export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
     prioridad: 'MEDIA',
-    responsable: '',
+    responsableRecursoId: '', // Nuevo campo para recurso
     fechaInicio: '',
     fechaFinEstimada: '',
     faseIds: [] // Para tareas multifase
@@ -23,7 +24,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         titulo: tarea.titulo || '',
         descripcion: tarea.descripcion || '',
         prioridad: tarea.prioridad || 'MEDIA',
-        responsable: tarea.responsable || '',
+        responsableRecursoId: tarea.responsableRecursoId || '', // ID del recurso si existe
         fechaInicio: tarea.fechaInicio || '',
         fechaFinEstimada: tarea.fechaFinEstimada || '',
         faseIds: faseIds
@@ -35,7 +36,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         titulo: '',
         descripcion: '',
         prioridad: 'MEDIA',
-        responsable: '',
+        responsableRecursoId: '',
         fechaInicio: proyecto?.fechaInicio || '',
         fechaFinEstimada: proyecto?.fechaFinEstimada || '',
         faseIds: []
@@ -55,6 +56,21 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
       setErrors(prev => ({
         ...prev,
         [name]: ''
+      }));
+    }
+  };
+
+  const handleResponsableChange = (responsableRecursoId) => {
+    setFormData(prev => ({
+      ...prev,
+      responsableRecursoId
+    }));
+    
+    // Limpiar error del responsable
+    if (errors.responsableRecursoId) {
+      setErrors(prev => ({
+        ...prev,
+        responsableRecursoId: ''
       }));
     }
   };
@@ -98,8 +114,8 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
       newErrors.descripcion = 'La descripción debe tener al menos 10 caracteres';
     }
 
-    if (!formData.responsable.trim()) {
-      newErrors.responsable = 'El responsable es obligatorio';
+    if (!formData.responsableRecursoId.trim()) {
+      newErrors.responsableRecursoId = 'Debe seleccionar un responsable para la tarea';
     }
 
     if (formData.fechaInicio && proyecto && formData.fechaInicio < proyecto.fechaInicio) {
@@ -132,11 +148,20 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
 
     setIsSubmitting(true);
     try {
-      // Convertir faseIds a números
+      // Preparar datos para envío
       const dataToSubmit = {
-        ...formData,
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        prioridad: formData.prioridad,
+        fechaInicio: formData.fechaInicio,
+        fechaFinEstimada: formData.fechaFinEstimada,
         faseIds: formData.faseIds.map(id => parseInt(id))
       };
+
+      // Si hay responsable seleccionado, agregar el ID del recurso
+      if (formData.responsableRecursoId) {
+        dataToSubmit.responsableRecursoId = formData.responsableRecursoId;
+      }
       
       await onSubmit(dataToSubmit);
     } catch (error) {
@@ -144,20 +169,6 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const getResponsablesSugeridos = () => {
-    // Lista de responsables comunes (podrías obtenerla del backend)
-    return [
-      'Ana García',
-      'Juan Pérez',
-      'María Rodríguez',
-      'Carlos López',
-      'Laura Martínez',
-      'Pedro Sánchez',
-      'Carmen Jiménez',
-      'Miguel Torres'
-    ];
   };
 
   return (
@@ -216,33 +227,25 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
 
       {/* Responsable y Prioridad */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Responsable - AHORA CON RECURSO SELECTOR */}
         <div>
-          <label htmlFor="responsable" className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Responsable *
           </label>
-          <input
-            type="text"
-            id="responsable"
-            name="responsable"
-            value={formData.responsable}
-            onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.responsable ? 'border-red-500' : 'border-gray-300'
-            }`}
-            placeholder="Nombre del responsable"
-            list="responsables-sugeridos"
+          <RecursoSelector
+            value={formData.responsableRecursoId}
+            onChange={handleResponsableChange}
+            tipo="responsable"
+            error={errors.responsableRecursoId}
+            required={true}
+            disabled={isSubmitting}
           />
-          
-          {/* Lista de sugerencias */}
-          <datalist id="responsables-sugeridos">
-            {getResponsablesSugeridos().map(responsable => (
-              <option key={responsable} value={responsable} />
-            ))}
-          </datalist>
-          
-          {errors.responsable && (
-            <p className="text-red-600 text-sm mt-1">{errors.responsable}</p>
+          {errors.responsableRecursoId && (
+            <p className="text-red-600 text-sm mt-1">{errors.responsableRecursoId}</p>
           )}
+          <p className="text-gray-500 text-xs mt-1">
+            💡 El responsable será quien ejecute esta tarea
+          </p>
         </div>
 
         <div>
@@ -394,11 +397,22 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
           </h4>
           <div className="text-green-700 text-sm space-y-1">
             <p>• Será asignada a {formData.faseIds.length} fase{formData.faseIds.length > 1 ? 's' : ''}</p>
-            <p>• Responsable: {formData.responsable || 'Sin asignar'}</p>
+            <p>• Responsable: {formData.responsableRecursoId ? 'Recurso seleccionado' : 'Sin asignar'}</p>
             <p>• Prioridad: {formData.prioridad}</p>
             {formData.faseIds.length > 1 && (
               <p>• ⭐ Tarea multifase - aparecerá en múltiples etapas</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Previsualización del responsable seleccionado */}
+      {formData.responsableRecursoId && (
+        <div className="bg-green-50 p-4 rounded-lg">
+          <h4 className="font-medium text-green-800 mb-2">✅ Responsable seleccionado:</h4>
+          <div className="text-green-700 text-sm">
+            <p>La tarea será asignada al recurso seleccionado como responsable.</p>
+            <p>Podrás cambiar la asignación posteriormente desde la gestión de tareas.</p>
           </div>
         </div>
       )}

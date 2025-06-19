@@ -76,6 +76,79 @@ class ProyectosService {
   }
 
   // ================================
+  // PROYECTOS CON RECURSOS
+  // ================================
+
+  async createProyectoConRecurso(proyecto) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/con-recurso`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(proyecto)
+      });
+      if (!response.ok) throw new Error('Error al crear proyecto con recurso');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async asignarLiderRecurso(proyectoId, liderRecursoId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/${proyectoId}/asignar-lider`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ liderRecursoId })
+      });
+      if (!response.ok) throw new Error('Error al asignar líder');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async removerLiderRecurso(proyectoId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/${proyectoId}/remover-lider`, {
+        method: 'PUT'
+      });
+      if (!response.ok) throw new Error('Error al remover líder');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getProyectosPorLider(liderRecursoId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/lider/${liderRecursoId}`);
+      if (!response.ok) throw new Error('Error al obtener proyectos por líder');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getProyectosSinLider() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/sin-lider`);
+      if (!response.ok) throw new Error('Error al obtener proyectos sin líder');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  // ================================
   // GESTIÓN DE FASES
   // ================================
   
@@ -138,6 +211,236 @@ class ProyectosService {
       throw error;
     }
   }
+
+  // ================================
+  // TAREAS CON RECURSOS
+  // ================================
+
+  async createTareaConRecurso(proyectoId, tarea) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/${proyectoId}/tareas/con-recurso`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tarea)
+      });
+      if (!response.ok) throw new Error('Error al crear tarea con recurso');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async asignarResponsableRecurso(tareaId, responsableRecursoId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/tareas/${tareaId}/asignar-responsable`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ responsableRecursoId })
+      });
+      if (!response.ok) throw new Error('Error al asignar responsable');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async removerResponsableRecurso(tareaId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/tareas/${tareaId}/remover-responsable`, {
+        method: 'PUT'
+      });
+      if (!response.ok) throw new Error('Error al remover responsable');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getTareasPorResponsable(responsableRecursoId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/tareas/responsable/${responsableRecursoId}`);
+      if (!response.ok) throw new Error('Error al obtener tareas por responsable');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getTareasSinResponsable() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/tareas/sin-responsable`);
+      if (!response.ok) throw new Error('Error al obtener tareas sin responsable');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getCargaTrabajoRecurso(recursoId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/recursos/${recursoId}/carga-trabajo`);
+      if (!response.ok) throw new Error('Error al obtener carga de trabajo');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getCargaTrabajoTodosRecursos() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/recursos/carga-trabajo`);
+      if (!response.ok) throw new Error('Error al obtener carga de trabajo de recursos');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getRecursosDisponiblesParaTareas() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/recursos/disponibles-tareas`);
+      if (!response.ok) throw new Error('Error al obtener recursos disponibles');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  // ================================
+  // GESTIÓN DE RECURSOS
+  // ================================
+
+  async getAllRecursos() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos`);
+      if (!response.ok) throw new Error('Error al obtener recursos');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getRecursoById(id) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/${id}`);
+      if (!response.ok) throw new Error('Error al obtener recurso');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async buscarRecursos(termino) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/buscar?termino=${encodeURIComponent(termino)}`);
+      if (!response.ok) throw new Error('Error al buscar recursos');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getRecursosPorRol(rolId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/rol/${rolId}`);
+      if (!response.ok) throw new Error('Error al obtener recursos por rol');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getRecursosDisponibles() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/disponibles`);
+      if (!response.ok) throw new Error('Error al obtener recursos disponibles');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async sincronizarRecursos() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/sincronizar`, {
+        method: 'POST'
+      });
+      if (!response.ok) throw new Error('Error al sincronizar recursos');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async activarRecurso(id) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/${id}/activar`, {
+        method: 'PUT'
+      });
+      if (!response.ok) throw new Error('Error al activar recurso');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async desactivarRecurso(id) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/${id}/desactivar`, {
+        method: 'PUT'
+      });
+      if (!response.ok) throw new Error('Error al desactivar recurso');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async getEstadisticasRecursos() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/estadisticas`);
+      if (!response.ok) throw new Error('Error al obtener estadísticas de recursos');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async testApiExterna() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/recursos/test-api-externa`);
+      if (!response.ok) throw new Error('Error al probar API externa');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  // ================================
+  // MÉTODOS ORIGINALES DE TAREAS
+  // ================================
 
   async asignarMultiplesFases(tareaId, faseIds) {
     try {

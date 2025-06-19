@@ -62,9 +62,18 @@ export default function TareasPage() {
 
   const handleCreateTarea = async (tareaData) => {
     try {
-      const newTarea = await proyectosService.createTarea(proyectoId, tareaData);
+      let newTarea;
       
-      // Si se asignaron múltiples fases
+      // Decidir qué endpoint usar según si hay responsable recurso o no
+      if (tareaData.responsableRecursoId) {
+        // Usar endpoint con recurso
+        newTarea = await proyectosService.createTareaConRecurso(proyectoId, tareaData);
+      } else {
+        // Usar endpoint tradicional (fallback por compatibilidad)
+        newTarea = await proyectosService.createTarea(proyectoId, tareaData);
+      }
+      
+      // Si se asignaron múltiples fases, usar el endpoint específico
       if (tareaData.faseIds && tareaData.faseIds.length > 1) {
         await proyectosService.asignarMultiplesFases(newTarea.idTarea, tareaData.faseIds);
       }
@@ -72,9 +81,12 @@ export default function TareasPage() {
       // Recargar tareas para obtener la info actualizada
       await loadTareas();
       setShowForm(false);
+      
+      console.log('Tarea creada exitosamente:', newTarea);
+      
     } catch (err) {
-      setError('Error al crear la tarea');
-      console.error(err);
+      setError('Error al crear la tarea. ' + (err.message || ''));
+      console.error('Error detallado:', err);
     }
   };
 
@@ -90,14 +102,25 @@ export default function TareasPage() {
 
   const handleUpdateTarea = async (tareaData) => {
     try {
-      // Aquí implementarías la actualización
-      // Por ahora, recargamos las tareas
+      // Si estamos editando y hay cambio de responsable
+      if (tareaData.responsableRecursoId && tareaData.responsableRecursoId !== editingTarea.responsableRecursoId) {
+        // Asignar nuevo responsable recurso
+        await proyectosService.asignarResponsableRecurso(editingTarea.idTarea, tareaData.responsableRecursoId);
+      } else if (!tareaData.responsableRecursoId && editingTarea.responsableRecursoId) {
+        // Remover responsable recurso si se deseleccionó
+        await proyectosService.removerResponsableRecurso(editingTarea.idTarea);
+      }
+      
+      // Recargar tareas para ver los cambios
       await loadTareas();
       setEditingTarea(null);
       setShowForm(false);
+      
+      console.log('Tarea actualizada exitosamente');
+      
     } catch (err) {
-      setError('Error al actualizar la tarea');
-      console.error(err);
+      setError('Error al actualizar la tarea. ' + (err.message || ''));
+      console.error('Error detallado:', err);
     }
   };
 
@@ -136,11 +159,13 @@ export default function TareasPage() {
   const openCreateForm = () => {
     setEditingTarea(null);
     setShowForm(true);
+    setError(null); // Limpiar errores al abrir formulario
   };
 
   const closeForm = () => {
     setShowForm(false);
     setEditingTarea(null);
+    setError(null); // Limpiar errores al cerrar formulario
   };
 
   // Filtrar tareas según criterios
