@@ -7,6 +7,13 @@ export const getTicketsFiltrados = async ({ idProducto, version }) => {
   return await res.json();
 };
 
+export const getTicketsByVersion = async ({  idVersion }) => {
+  console.log("VERSION FETCH " + idVersion)
+  const res = await fetch(`${BASE_URL}/version/${idVersion}`);
+  if (!res.ok) throw new Error("Error al obtener tickets filtrados por version");
+  return await res.json();
+};
+
 export const addTicket = async (ticket) => {
   const res = await fetch(BASE_URL, {
     method: "POST",
@@ -32,7 +39,7 @@ export const getMetadatos = async () => {
 
 export const getTicketById = async (id) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPPORT_MODULE_BACKEND_URL}/ticket/${id}`
+    `${process.env.NEXT_PUBLIC_SUPPORT_MODULE_BACKEND_URL}/ticket/data/${id}`
   );
   if (!res.ok) throw new Error("Error al obtener el ticket");
   return res.json();

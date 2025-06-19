@@ -28,7 +28,7 @@ export const obtenerLabelEstado = (code) => {
 };
 
 export const mapearTicketsConDatos = (tickets, clientes, responsables) => {
-  return tickets.map((ticket) => ({
+  const ticketsMap = tickets.map((ticket) => { const t = ({
     ...ticket,
     nombreCliente: obtenerNombreCliente(ticket.idCliente, clientes),
     nombreResponsable: obtenerNombreResponsable(
@@ -38,11 +38,16 @@ export const mapearTicketsConDatos = (tickets, clientes, responsables) => {
     prioridadLabel: obtenerLabelPrioridad(ticket.prioridad),
     severidadLabel: obtenerLabelSeveridad(ticket.severidad),
     estadoLabel: obtenerLabelEstado(ticket.estado),
-  }));
+  }
+)
+  console.log("TicketMap " + JSON.stringify(t))
+  return t
+});
+  return ticketsMap
 };
 
 export const mapearTicketConDatos = (ticket, clientes, responsables) => {
-  return {
+  const ticketDatos = {
     ...ticket,
     nombreCliente: obtenerNombreCliente(ticket.idCliente, clientes),
     nombreResponsable: obtenerNombreResponsable(
@@ -53,4 +58,6 @@ export const mapearTicketConDatos = (ticket, clientes, responsables) => {
     severidadLabel: obtenerLabelSeveridad(ticket.severidad),
     estadoLabel: obtenerLabelEstado(ticket.estado),
   };
+
+  return ticketDatos
 };

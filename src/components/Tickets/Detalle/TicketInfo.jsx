@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { getClientes, getResponsables } from "@/api/serviciosExternos";
 
 export default function TicketInfo({ ticket }) {
+  /*
   const [clientes, setClientes] = useState([]);
   const [responsables, setResponsables] = useState([]);
 
@@ -28,8 +29,9 @@ export default function TicketInfo({ ticket }) {
     };
     fetchClientesYResponsables();
   }, []);
+  */
 
-  const ticketFormateado = mapearTicketConDatos(ticket, clientes, responsables);
+  const ticketFormateado = ticket; //mapearTicketConDatos(ticket, clientes, responsables);
 
   return (
     <div className="p-4 shadow-2xl bg-white space-y-2 text-sm hover:shadow-sky-950 rounded-md h-full">
@@ -48,25 +50,25 @@ export default function TicketInfo({ ticket }) {
           <span
             className={`inline-block px-2 py-0.5 rounded text-white text-xs font-semibold
               ${
-                mapearPrioridad(ticketFormateado.prioridadLabel) === "Alta"
+                ticketFormateado.prioridadLabel == "Alta"
                   ? "bg-red-600"
-                  : mapearPrioridad(ticketFormateado.prioridadLabel) === "Media"
+                  : ticketFormateado.prioridadLabel == "Media"
                   ? "bg-yellow-500"
                   : "bg-green-600"
               }
             `}
           >
-            {mapearPrioridad(ticketFormateado.prioridadLabel) || "—"}
+            {ticketFormateado.prioridadLabel || "—"}
           </span>
         </span>
 
         <span className="text-gray-600">Severidad:</span>
-        <span>{mapearSeveridad(ticketFormateado.severidadLabel)}</span>
+        <span>{ticketFormateado.severidadLabel}</span>
 
         <span className="text-gray-600">Estado Actual:</span>
         <span>
           <span className="bg-blue-600 text-white px-2 py-0.5 rounded text-xs font-semibold">
-            {mapearEstado(ticket.estado) || "—"}
+            {ticket.estadoLabel || "—"}
           </span>
         </span>
 

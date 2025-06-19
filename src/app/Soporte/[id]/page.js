@@ -23,11 +23,13 @@ const VistaTicket = () => {
       try {
         const data = await getTicketById(id);
         setTicket(data);
+        /*
         const productoNombre = await getProductos();
         const productoFiltrado = productoNombre.find(
           (p) => p.id === data.idProducto
         );
         setProducto(productoFiltrado ? productoFiltrado.nombre : "Desconocido");
+        */
       } catch (error) {
         console.error("Error al obtener el ticket:", error);
       } finally {

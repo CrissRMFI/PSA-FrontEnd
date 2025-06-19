@@ -20,17 +20,17 @@ export default function SeleccionadorProducto({
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {productos.map((producto) => (
         <div
-          key={producto.id}
+          key={producto.idProducto}
           className={`p-4 rounded border shadow hover:shadow-md cursor-pointer transition-all
             ${
-              productoSeleccionado === producto.id
+              productoSeleccionado === producto.idProducto
                 ? "border-blue-500 bg-blue-50"
                 : "border-gray-300"
             }`}
-          onClick={() => onSeleccionarProducto(producto.id)}
+          onClick={() => onSeleccionarProducto(producto.idProducto)}
         >
           <h3 className="text-lg font-semibold text-slate-700">
-            {producto.nombre}
+            {producto.nombreProducto}
           </h3>
           <p className="text-sm text-slate-500">
             Versiones: {producto.versiones.length}

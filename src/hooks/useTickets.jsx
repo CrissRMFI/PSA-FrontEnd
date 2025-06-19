@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import { getTicketsFiltrados } from "@/api/tickets";
+import { getTicketsByVersion } from "@/api/tickets";
 
-export default function useTickets(producto, version) {
+export default function useTickets(producto, versionId) {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTickets = async (producto, version) => {
+    const fetchTickets = async (producto, versionId) => {
       try {
-        const data = await getTicketsFiltrados({
-          idProducto: producto,
-          version,
+        console.log("VERSION USE EFF" + versionId)
+        const data = await getTicketsByVersion({
+          idVersion: versionId,
+          //idProducto: producto,
         });
         setTickets(data);
       } catch (err) {
@@ -20,8 +21,8 @@ export default function useTickets(producto, version) {
       }
     };
 
-    fetchTickets(producto, version);
-  }, [producto, version]);
+    fetchTickets(producto, versionId);
+  }, [producto, versionId]);
 
   return { tickets, setTickets, loading };
 }
