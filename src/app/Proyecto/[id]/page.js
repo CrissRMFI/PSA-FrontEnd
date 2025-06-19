@@ -231,21 +231,26 @@ export default function ProyectoDetailPage() {
         </Link>
 
         {/* Gestión de Riesgos */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <Link
+          href={`/Proyecto/${proyectoId}/riesgos`}
+          className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 block group"
+        >
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-red-100 rounded-lg">
               <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Próximamente</span>
+            <svg className="w-5 h-5 text-gray-400 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Gestionar Riesgos</h3>
           <p className="text-gray-600 text-sm mb-3">Identifica y mitiga riesgos del proyecto</p>
           <div className="text-red-600 font-medium text-sm">
-            {proyecto.riesgosActivos || 0} riesgos activos
+            {proyecto.riesgosActivos || 0} riesgos activos →
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Resumen de Fases */}
