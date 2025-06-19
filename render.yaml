@@ -4,7 +4,7 @@ services:
     name: front-tribu-b-2025-2c-dev
     runtime: node
     buildCommand: 'npm install'
-    startCommand: 'npm run dev'
+    startCommand: 'npm start'
     repo: https://github.com/CrissRMFI/PSA-FrontEnd.git
     branch: 'develop'
     autoDeployTrigger: commit
