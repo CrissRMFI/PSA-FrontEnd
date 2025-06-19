@@ -1,4 +1,4 @@
-const PRODUCTOS_URL = `${process.env.SUPPORT_MODULE_BACKEND_URL}/external/resources`;
+const PRODUCTOS_URL = `${process.env.NEXT_PUBLIC_SUPPORT_MODULE_BACKEND_URL}/external/resources`;
 
 export const getProductos = async () => {
   const res = await fetch(PRODUCTOS_URL);

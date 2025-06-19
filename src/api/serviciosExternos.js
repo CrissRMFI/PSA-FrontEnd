@@ -1,5 +1,5 @@
-const URL_CLIENTES = `${process.env.SUPPORT_MODULE_BACKEND_URL}/external/clients`;
-const URL_RESPONSABLES = `${process.env.SUPPORT_MODULE_BACKEND_URL}/external/resources`;
+const URL_CLIENTES = `${process.env.NEXT_PUBLIC_SUPPORT_MODULE_BACKEND_URL}/external/clients`;
+const URL_RESPONSABLES = `${process.env.NEXT_PUBLIC_SUPPORT_MODULE_BACKEND_URL}/external/resources`;
 
 export const getClientes = async () => {
   console.log(URL_CLIENTES)
