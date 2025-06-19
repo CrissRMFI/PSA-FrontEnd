@@ -180,6 +180,60 @@ class ProyectosService {
     }
   }
 
+  async updateFase(faseId, fase) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/fases/${faseId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(fase)
+      });
+      if (!response.ok) throw new Error('Error al actualizar fase');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async deleteFase(faseId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/fases/${faseId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Error al eliminar fase');
+      return true;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async deleteFaseForce(faseId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/fases/${faseId}/forzar`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Error al eliminar fase forzadamente');
+      return true;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async canDeleteFase(faseId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/fases/${faseId}/puede-eliminar`);
+      if (!response.ok) throw new Error('Error al verificar eliminación de fase');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
   // ================================
   // GESTIÓN DE TAREAS
   // ================================
@@ -206,6 +260,36 @@ class ProyectosService {
       });
       if (!response.ok) throw new Error('Error al crear tarea');
       return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async updateTarea(tareaId, tarea) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/tareas/${tareaId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tarea)
+      });
+      if (!response.ok) throw new Error('Error al actualizar tarea');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async deleteTarea(tareaId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/tareas/${tareaId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Error al eliminar tarea');
+      return true;
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -500,6 +584,17 @@ class ProyectosService {
     }
   }
 
+  async getRiesgoById(riesgoId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/riesgos/${riesgoId}`);
+      if (!response.ok) throw new Error('Error al obtener riesgo');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
   async createRiesgo(proyectoId, riesgo) {
     try {
       const response = await fetch(`${API_BASE_URL}/proyectos/${proyectoId}/riesgos`, {
@@ -510,6 +605,53 @@ class ProyectosService {
         body: JSON.stringify(riesgo)
       });
       if (!response.ok) throw new Error('Error al crear riesgo');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async updateRiesgo(riesgoId, riesgo) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/riesgos/${riesgoId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(riesgo)
+      });
+      if (!response.ok) throw new Error('Error al actualizar riesgo');
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async deleteRiesgo(riesgoId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/riesgos/${riesgoId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Error al eliminar riesgo');
+      return true;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
+
+  async cambiarEstadoRiesgo(riesgoId, estado) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/proyectos/riesgos/${riesgoId}/estado`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ estado })
+      });
+      if (!response.ok) throw new Error('Error al cambiar estado del riesgo');
       return await response.json();
     } catch (error) {
       console.error('Error:', error);

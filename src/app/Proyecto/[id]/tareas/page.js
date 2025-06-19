@@ -102,12 +102,13 @@ export default function TareasPage() {
 
   const handleUpdateTarea = async (tareaData) => {
     try {
-      // Si estamos editando y hay cambio de responsable
+      // Actualizar la tarea usando el endpoint directo
+      await proyectosService.updateTarea(editingTarea.idTarea, tareaData);
+      
+      // Si hay cambio de responsable recurso, usar endpoint específico
       if (tareaData.responsableRecursoId && tareaData.responsableRecursoId !== editingTarea.responsableRecursoId) {
-        // Asignar nuevo responsable recurso
         await proyectosService.asignarResponsableRecurso(editingTarea.idTarea, tareaData.responsableRecursoId);
       } else if (!tareaData.responsableRecursoId && editingTarea.responsableRecursoId) {
-        // Remover responsable recurso si se deseleccionó
         await proyectosService.removerResponsableRecurso(editingTarea.idTarea);
       }
       
@@ -126,12 +127,17 @@ export default function TareasPage() {
 
   const handleDeleteTarea = async () => {
     try {
-      // Aquí implementarías la eliminación
-      setTareas(prev => prev.filter(t => t.idTarea !== deletingTarea.idTarea));
+      await proyectosService.deleteTarea(deletingTarea.idTarea);
+      setTareas(prev => 
+        prev.filter(t => t.idTarea !== deletingTarea.idTarea)
+      );
       setDeletingTarea(null);
+      
+      console.log('Tarea eliminada exitosamente');
+      
     } catch (err) {
-      setError('Error al eliminar la tarea');
-      console.error(err);
+      setError('Error al eliminar la tarea. ' + (err.message || ''));
+      console.error('Error detallado:', err);
     }
   };
 

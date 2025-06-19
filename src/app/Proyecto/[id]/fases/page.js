@@ -59,26 +59,50 @@ export default function FasesPage() {
 
   const handleUpdateFase = async (faseData) => {
     try {
-      // Aquí podrías agregar un endpoint de update en el backend
-      // Por ahora recargamos todas las fases
-      await loadProyectoYFases();
+      await proyectosService.updateFase(editingFase.idFase, faseData);
+      await loadProyectoYFases(); // Recargar para ver cambios
       setEditingFase(null);
       setShowForm(false);
+      
+      console.log('Fase actualizada exitosamente');
+      
     } catch (err) {
-      setError('Error al actualizar la fase');
-      console.error(err);
+      setError('Error al actualizar la fase. ' + (err.message || ''));
+      console.error('Error detallado:', err);
     }
   };
 
   const handleDeleteFase = async () => {
     try {
-      // Aquí podrías agregar un endpoint de delete en el backend
-      // Por ahora simulamos la eliminación
+      // Verificar si se puede eliminar
+      const verificacion = await proyectosService.canDeleteFase(deletingFase.idFase);
+      
+      if (!verificacion.puedeEliminar) {
+        // Mostrar confirmación para eliminación forzada
+        const confirmar = window.confirm(
+          `${verificacion.mensaje}\n\n¿Deseas eliminar la fase y todas sus tareas de todas formas?`
+        );
+        
+        if (confirmar) {
+          // Eliminación forzada
+          await proyectosService.deleteFaseForce(deletingFase.idFase);
+        } else {
+          setDeletingFase(null);
+          return;
+        }
+      } else {
+        // Eliminación normal
+        await proyectosService.deleteFase(deletingFase.idFase);
+      }
+      
       setFases(prev => prev.filter(f => f.idFase !== deletingFase.idFase));
       setDeletingFase(null);
+      
+      console.log('Fase eliminada exitosamente');
+      
     } catch (err) {
-      setError('Error al eliminar la fase');
-      console.error(err);
+      setError('Error al eliminar la fase. ' + (err.message || ''));
+      console.error('Error detallado:', err);
     }
   };
 

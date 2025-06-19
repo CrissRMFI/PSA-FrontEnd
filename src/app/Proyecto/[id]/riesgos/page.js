@@ -61,8 +61,18 @@ export default function RiesgosPage() {
 
   const handleUpdateRiesgo = async (riesgoData) => {
     try {
-      // Aquí implementarías la actualización
-      await loadRiesgos();
+      // Usar la API real para actualizar el riesgo
+      const updatedRiesgo = await proyectosService.updateRiesgo(editingRiesgo.idRiesgo, riesgoData);
+      
+      // Actualizar el estado local con el riesgo actualizado
+      setRiesgos(prev => 
+        prev.map(r => 
+          r.idRiesgo === editingRiesgo.idRiesgo 
+            ? updatedRiesgo 
+            : r
+        )
+      );
+      
       setEditingRiesgo(null);
       setShowForm(false);
     } catch (err) {
@@ -71,19 +81,12 @@ export default function RiesgosPage() {
     }
   };
 
-  const loadRiesgos = async () => {
-    try {
-      const riesgosData = await proyectosService.getRiesgosByProyecto(proyectoId);
-      setRiesgos(riesgosData);
-    } catch (err) {
-      setError('Error al cargar los riesgos');
-      console.error(err);
-    }
-  };
-
   const handleDeleteRiesgo = async () => {
     try {
-      // Simular eliminación (implementar endpoint en backend)
+      // Usar la API real para eliminar el riesgo
+      await proyectosService.deleteRiesgo(deletingRiesgo.idRiesgo);
+      
+      // Actualizar el estado local removiendo el riesgo eliminado
       setRiesgos(prev => prev.filter(r => r.idRiesgo !== deletingRiesgo.idRiesgo));
       setDeletingRiesgo(null);
     } catch (err) {
@@ -94,11 +97,14 @@ export default function RiesgosPage() {
 
   const handleCambiarEstado = async (riesgoId, nuevoEstado) => {
     try {
-      // Simular cambio de estado (implementar endpoint en backend)
+      // Usar la API real para cambiar el estado del riesgo
+      const updatedRiesgo = await proyectosService.cambiarEstadoRiesgo(riesgoId, nuevoEstado);
+      
+      // Actualizar el estado local con el nuevo estado
       setRiesgos(prev => 
         prev.map(r => 
           r.idRiesgo === riesgoId 
-            ? { ...r, estado: nuevoEstado }
+            ? updatedRiesgo 
             : r
         )
       );
