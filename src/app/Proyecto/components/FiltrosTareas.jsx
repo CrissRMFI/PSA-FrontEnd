@@ -139,9 +139,9 @@ export default function FiltrosTareas({ filtros, setFiltros, fases, tareas }) {
                 <option value="">Todas las fases</option>
                 {fases
                   .sort((a, b) => a.orden - b.orden)
-                  .map(fase => (
+                  .map((fase, index) => (
                     <option key={fase.idFase} value={fase.idFase.toString()}>
-                      {fase.orden}. {fase.nombre}
+                      {index + 1}. {fase.nombre}
                     </option>
                   ))}
               </select>

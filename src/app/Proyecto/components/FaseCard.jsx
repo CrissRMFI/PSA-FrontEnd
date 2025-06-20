@@ -6,10 +6,11 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
     return new Date(dateString).toLocaleDateString('es-ES');
   };
 
-  const getOrderIcon = (orden) => {
+  // ✅ CAMBIO: Usar index + 1 para el orden visual
+  const getOrderIcon = (numeroVisual) => {
     return (
       <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">
-        {orden}
+        {numeroVisual}
       </div>
     );
   };
@@ -33,6 +34,9 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
     return new Date(fase.fechaFinEstimada) < new Date();
   };
 
+  // ✅ CAMBIO: Calcular número visual basado en el índice
+  const numeroVisual = index + 1;
+
   return (
     <div className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border-l-4 ${
       fase.estadoDescriptivo === 'Completada' ? 'border-green-500' :
@@ -44,7 +48,8 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
         {/* Header de la fase */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
-            {getOrderIcon(fase.orden)}
+            {/* ✅ CAMBIO: Usar numeroVisual en lugar de fase.orden */}
+            {getOrderIcon(numeroVisual)}
             <div>
               <h3 className="text-xl font-bold text-gray-800">
                 {fase.nombre}
@@ -128,7 +133,8 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
             <div className={`w-2 h-2 rounded-full mr-2 ${
               index === 0 ? 'bg-green-500' : 'bg-gray-300'
             }`}></div>
-            <span>Fase {fase.orden}</span>
+            {/* ✅ CAMBIO: Mostrar número visual pero mantener referencia al ID real */}
+            <span>Fase {numeroVisual}</span>
           </div>
           
           <div className="flex-1 mx-4 h-px bg-gray-200 relative">
@@ -154,7 +160,8 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
           </Link>
           
           <div className="text-xs text-gray-500">
-            Orden: {fase.orden}
+            {/* ✅ CAMBIO: Mostrar tanto el orden visual como el orden real del backend */}
+            Posición: {numeroVisual} | Orden BD: {fase.orden}
           </div>
         </div>
       </div>

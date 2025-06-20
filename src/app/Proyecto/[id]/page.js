@@ -260,11 +260,12 @@ export default function ProyectoDetailPage() {
           <div className="space-y-3">
             {proyecto.fases
               .sort((a, b) => a.orden - b.orden)
-              .map((fase) => (
+              .map((fase, index) => (
                 <div key={fase.idFase} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
+                    {/* ✅ CAMBIO: Usar index + 1 para mostrar numeración visual continua */}
                     <div className="flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full font-bold text-xs">
-                      {fase.orden}
+                      {index + 1}
                     </div>
                     <span className="font-medium text-gray-800">{fase.nombre}</span>
                     <span className={`px-2 py-1 rounded-full text-xs ${

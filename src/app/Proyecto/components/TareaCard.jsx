@@ -135,13 +135,13 @@ export default function TareaCard({
             <div className="flex flex-wrap gap-2">
               {tarea.fases
                 .sort((a, b) => a.orden - b.orden)
-                .map((fase) => (
+                .map((fase, index) => (
                   <div
                     key={fase.idFase}
                     className="flex items-center space-x-1 bg-purple-50 text-purple-600 px-2 py-1 rounded-lg text-xs"
                   >
                     <span className="w-4 h-4 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">
-                      {fase.orden}
+                      {index + 1}
                     </span>
                     <span>{fase.nombre}</span>
                   </div>
@@ -199,7 +199,10 @@ export default function TareaCard({
             <span>ID: {tarea.idTarea}</span>
             {tarea.fases && tarea.fases.length > 0 && (
               <span>
-                Fases: {tarea.fases.map(f => f.orden).sort((a, b) => a - b).join(', ')}
+                Fases: {tarea.fases
+                  .sort((a, b) => a.orden - b.orden)
+                  .map((_, index) => index + 1)
+                  .join(', ')}
               </span>
             )}
           </div>

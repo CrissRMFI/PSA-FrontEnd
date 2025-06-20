@@ -342,7 +342,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
           <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
             {fases
               .sort((a, b) => a.orden - b.orden)
-              .map((fase) => (
+              .map((fase, index) => (
                 <div key={fase.idFase} className="flex items-center">
                   <input
                     type={isMultifase ? "checkbox" : "radio"}
@@ -356,7 +356,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
                   <label htmlFor={`fase-${fase.idFase}`} className="flex-1 text-sm">
                     <div className="flex items-center space-x-2">
                       <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
-                        {fase.orden}
+                        {index + 1}
                       </span>
                       <span className="font-medium">{fase.nombre}</span>
                       <span className="text-gray-500 text-xs">
