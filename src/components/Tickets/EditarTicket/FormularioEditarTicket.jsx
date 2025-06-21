@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { getMetadatos } from "@/api/tickets";
+import { getResponsables } from "@/api/serviciosExternos";
 
 export default function FormularioEditarTicket({ ticket, onClose, onSave }) {
   const [form, setForm] = useState({ ...ticket });
   const [prioridades, setPrioridades] = useState([]);
   const [severidades, setSeveridades] = useState([]);
   const [estados, setEstados] = useState([]);
+  const [responsables, setResponsables] = useState([]);
 
   useEffect(() => {
     getMetadatos().then((meta) => {
@@ -15,6 +17,7 @@ export default function FormularioEditarTicket({ ticket, onClose, onSave }) {
       setSeveridades(meta.severidades);
       setEstados(meta.estados);
     });
+    getResponsables().then(setResponsables).catch(console.error);
   }, []);
 
   const handleChange = (e) => {
@@ -89,6 +92,23 @@ export default function FormularioEditarTicket({ ticket, onClose, onSave }) {
             ))}
           </select>
         </div>
+      </div>
+
+      <div>
+        <label className="block font-semibold">Responsable:</label>
+        <select
+          name="idResponsable"
+          value={form.idResponsable || ""}
+          onChange={handleChange}
+          className="border px-2 py-1 w-full rounded"
+        >
+          <option value="">Seleccionar responsable</option>
+          {responsables.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.nombre} {r.apellido}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>
