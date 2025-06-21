@@ -1,18 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SeleccionadorProducto from "@/components/Filtros/SeleccionadorProducto";
 import SeleccionadorVersion from "@/components/Filtros/SeleccionadorVersion";
 import TicketContainer from "@/components/Tickets/TicketContainer";
 import BotonNuevoTicket from "@/components/Tickets/BotonNuevoTicket";
 import ModalNuevoTicket from "@/components/Tickets/ModalNuevoTicket/ModalNuevoTicket";
 
+const STORAGE_KEY_PRODUCTO = "soporte_productoSeleccionado";
+const STORAGE_KEY_VERSION = "soporte_versionSeleccionada";
+
 export default function SoportePage() {
   const [productoSeleccionado, setProductoSeleccionado] = useState("");
-
   const [versionSeleccionada, setVersionSeleccionada] = useState("");
-
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Al cargar la página, restaurar estado desde localStorage
+  useEffect(() => {
+    const productoGuardado = localStorage.getItem(STORAGE_KEY_PRODUCTO);
+    const versionGuardada = localStorage.getItem(STORAGE_KEY_VERSION);
+
+    if (productoGuardado) setProductoSeleccionado(productoGuardado);
+    if (versionGuardada) setVersionSeleccionada(versionGuardada);
+  }, []);
+
+  // Guardar producto seleccionado en localStorage al cambiar
+  const manejarSeleccionProducto = (prod) => {
+    setProductoSeleccionado(prod);
+    setVersionSeleccionada("");
+    localStorage.setItem(STORAGE_KEY_PRODUCTO, prod);
+    localStorage.removeItem(STORAGE_KEY_VERSION);
+  };
+
+  // Guardar versión seleccionada en localStorage al cambiar
+  const manejarSeleccionVersion = (version) => {
+    setVersionSeleccionada(version);
+    localStorage.setItem(STORAGE_KEY_VERSION, version);
+  };
 
   return (
     <div className="p-10 mb-20">
@@ -23,17 +47,11 @@ export default function SoportePage() {
       </div>
 
       {modalOpen && (
-        <ModalNuevoTicket
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-        />
+        <ModalNuevoTicket isOpen={modalOpen} onClose={() => setModalOpen(false)} />
       )}
 
       <SeleccionadorProducto
-        onSeleccionarProducto={(prod) => {
-          setProductoSeleccionado(prod);
-          setVersionSeleccionada("");
-        }}
+        onSeleccionarProducto={manejarSeleccionProducto}
         productoSeleccionado={productoSeleccionado}
       />
 
@@ -41,15 +59,12 @@ export default function SoportePage() {
         <SeleccionadorVersion
           producto={productoSeleccionado}
           versionSeleccionada={versionSeleccionada}
-          onSeleccionarVersion={setVersionSeleccionada}
+          onSeleccionarVersion={manejarSeleccionVersion}
         />
       )}
 
       {productoSeleccionado && versionSeleccionada && (
-        <TicketContainer
-          producto={productoSeleccionado}
-          version={versionSeleccionada}
-        />
+        <TicketContainer producto={productoSeleccionado} version={versionSeleccionada} />
       )}
     </div>
   );
