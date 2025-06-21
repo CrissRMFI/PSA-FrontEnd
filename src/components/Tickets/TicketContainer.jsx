@@ -2,19 +2,20 @@
 
 import { useEffect, useState } from "react";
 import useTickets from "@/hooks/useTickets";
-import { PRIORIDADES, SEVERIDADES, ESTADOS } from "@/constantes/tickets";
 import Filtros from "@/components/Filtros/Filtros";
 import TablaTickets from "@/components/Tickets/Tabla/TablaTickets";
 import KanbanVista from "@/components/Tickets/Kanban/KanbanVista";
 import VistaSelector from "./VistaSelector";
-import { getClientes, getResponsables } from "@/api/serviciosExternos";
-import { mapearTicketsConDatos } from "@/utils/mapTicketData";
+//import { getClientes, getResponsables } from "@/api/serviciosExternos";
+//import { PRIORIDADES, SEVERIDADES, ESTADOS } from "@/constantes/tickets";
+//import { mapearTicketsConDatos } from "@/utils/mapTicketData";
 
 export default function TicketContainer({ producto, version }) {
+
   const { tickets, setTickets, loading } = useTickets(producto, version);
   const [vista, setVista] = useState("tabla");
-  const [clientes, setClientes] = useState([]);
-  const [responsables, setResponsables] = useState([]);
+  //const [clientes, setClientes] = useState([]);
+  //const [responsables, setResponsables] = useState([]);
 
   const [filtros, setFiltros] = useState({
     severidad: "",
@@ -24,14 +25,16 @@ export default function TicketContainer({ producto, version }) {
 
   const ticketsFiltrados = tickets.filter((ticket) => {
     return (
-      ticket.idProducto === producto &&
-      ticket.version === version &&
-      (filtros.severidad === "" || ticket.severidad === filtros.severidad) &&
-      (filtros.prioridad === "" || ticket.prioridad === filtros.prioridad) &&
-      (filtros.estado === "" || ticket.estado === filtros.estado)
+      (filtros.severidad === "" || ticket.severidad == filtros.severidad) &&
+      (filtros.prioridad === "" || ticket.prioridad == filtros.prioridad) &&
+      (filtros.estado === "" || ticket.estado == filtros.estado)
     );
   });
+ //const ticketsFiltrados = tickets;
 
+
+
+ /*
   useEffect(() => {
     const fetchClientesYResponsables = async () => {
       try {
@@ -47,13 +50,17 @@ export default function TicketContainer({ producto, version }) {
     };
     fetchClientesYResponsables();
   }, []);
+  */
 
+  const ticketsConNombres = ticketsFiltrados;
+  /*
   const ticketsConNombres = mapearTicketsConDatos(
     ticketsFiltrados,
     clientes,
     responsables
   );
-  console.log(ticketsConNombres);
+  */
+
 
   return (
     <>

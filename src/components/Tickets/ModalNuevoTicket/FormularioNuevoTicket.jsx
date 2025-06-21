@@ -83,6 +83,8 @@ export default function FormularioTicket({ onClose, onTicketCreado }) {
   const productoSeleccionado = productos.find((p) => p.id === form.idProducto);
   const versionesDisponibles = productoSeleccionado?.versiones || [];
 
+  console.log("VERSION SEL" + versionesDisponibles)
+
   return (
     <form className="space-y-4 text-sm">
       {showError && (
@@ -121,8 +123,8 @@ export default function FormularioTicket({ onClose, onTicketCreado }) {
           >
             <option value="">Seleccionar producto</option>
             {productos.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nombre}
+              <option key={p.idProducto} value={p.idProducto}>
+                {p.nombreProducto}
               </option>
             ))}
           </select>
@@ -138,9 +140,9 @@ export default function FormularioTicket({ onClose, onTicketCreado }) {
             disabled={!form.idProducto}
           >
             <option value="">Seleccionar versión</option>
-            {versionesDisponibles.map((v, idx) => (
-              <option key={idx} value={v}>
-                {v}
+            {versionesDisponibles.map(v => (
+              <option key={v.idVersion} value={v.idVersion}>
+                {v.nombreVersion}
               </option>
             ))}
           </select>
@@ -155,8 +157,8 @@ export default function FormularioTicket({ onClose, onTicketCreado }) {
             onChange={handleChange}
           >
             <option value="">Prioridad</option>
-            {prioridadesMeta.map((p, i) => (
-              <option key={i} value={p.code}>
+            {prioridadesMeta.map(p => (
+              <option key={p.code} value={p.code}>
                 {p.label}
               </option>
             ))}
@@ -172,8 +174,8 @@ export default function FormularioTicket({ onClose, onTicketCreado }) {
             onChange={handleChange}
           >
             <option value="">Severidad</option>
-            {severidadesMeta.map((s, i) => (
-              <option key={i} value={s.code}>
+            {severidadesMeta.map((s) => (
+              <option key={s.code} value={s.code}>
                 {s.label}
               </option>
             ))}

@@ -11,7 +11,7 @@ export default function SeleccionadorVersion({
   useEffect(() => {
     const fetchVersiones = async () => {
       const productos = await getProductos();
-      const productoEncontrado = productos.find((p) => p.id === producto);
+      const productoEncontrado = productos.find((p) => p.idProducto === producto);
       setVersiones(productoEncontrado?.versiones || []);
     };
 
