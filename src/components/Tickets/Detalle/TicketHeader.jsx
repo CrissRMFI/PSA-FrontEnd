@@ -1,30 +1,54 @@
+"use client";
+
 import ModalEditarTicket from "@/components/Tickets/EditarTicket/ModalEditarTicket";
 import { useState } from "react";
-import { updateTicket } from "@/api/tickets";
+import { updateTicket, deleteTicket } from "@/api/tickets";
+
 
 export default function TicketHeader({ ticket }) {
+  
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSave = async (data) => {
-    const respuesta = await updateTicket(ticket.internalId, data);
+    await updateTicket(ticket.internalId, data);
     location.reload();
   };
 
-  return (
-    <div className="mt-6">
-      <h1 className="text-2xl font-bold text-gray-800">
-        {ticket.codigo} – {ticket.nombre}
-      </h1>
+  const handleDelete = async () => {
+    const confirmacion = window.confirm("¿Estás seguro de que querés eliminar este ticket?");
+    if (confirmacion) {
+      await deleteTicket(ticket.internalId);
+      window.history.back();  
+    }
+  };
+  
 
-      <div className="flex items-center gap-4 mt-6">
+
+  return (
+    <div className="mt-6 space-y-4">
+   
+
+      <h1 className="text-2xl font-bold text-gray-800">{ticket.nombre}</h1>
+
+      <div className="flex justify-between items-center flex-wrap mt-4">
+        <div className="flex gap-4">
+          <button
+            className="bg-gray-800 text-white px-4 py-2 rounded shadow hover:bg-gray-700"
+            onClick={() => setModalOpen(true)}
+          >
+            Editar
+          </button>
+
+          <button className="bg-white border px-4 py-2 rounded hover:bg-gray-50">
+            Crear Tarea
+          </button>
+        </div>
+
         <button
-          className="bg-gray-800 text-white px-4 py-2 rounded shadow hover:bg-gray-700"
-          onClick={() => setModalOpen(true)}
+          className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700"
+          onClick={handleDelete}
         >
-          Editar
-        </button>
-        <button className="bg-white border px-4 py-2 rounded hover:bg-gray-50">
-          Crear Tarea
+          Eliminar
         </button>
       </div>
 

@@ -1,11 +1,10 @@
 "use client";
 import { getProductos } from "@/api/productos";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getClientes, getResponsables } from "@/api/serviciosExternos";
-import { useEffect } from "react";
 import { addTicket, getMetadatos } from "@/api/tickets";
 
-export default function FormularioTicket({ onClose }) {
+export default function FormularioTicket({ onClose, onTicketCreado }) {
   const [form, setForm] = useState({
     nombre: "",
     prioridad: "",
@@ -34,9 +33,7 @@ export default function FormularioTicket({ onClose }) {
       })
       .catch(console.error);
     getProductos()
-      .then((data) => {
-        setProductos(data);
-      })
+      .then(setProductos)
       .catch(console.error);
   }, []);
 
@@ -67,19 +64,23 @@ export default function FormularioTicket({ onClose }) {
     if (!estanTodosCompletos) {
       setShowError(true);
       setTimeout(() => setShowError(false), 2000);
-
       return;
     }
 
-    const nuevo = await addTicket({
-      ...form,
-    });
+    try {
+      const nuevo = await addTicket({ ...form });
 
-    onClose();
+     
+      if (onTicketCreado) onTicketCreado(nuevo);
+
+      onClose();
+    } catch (error) {
+      console.error("Error al crear ticket:", error);
+     
+    }
   };
 
   const productoSeleccionado = productos.find((p) => p.id === form.idProducto);
-
   const versionesDisponibles = productoSeleccionado?.versiones || [];
 
   return (
@@ -111,7 +112,6 @@ export default function FormularioTicket({ onClose }) {
             value={form.idProducto}
             onChange={(e) => {
               const selectedId = e.target.value;
-              const producto = productos.find((p) => p.id === selectedId);
               setForm((prev) => ({
                 ...prev,
                 idProducto: selectedId,
