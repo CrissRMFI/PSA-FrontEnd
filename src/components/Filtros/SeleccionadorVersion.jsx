@@ -31,8 +31,8 @@ export default function SeleccionadorVersion({
         >
           <option value="">Seleccione una versión</option>
           {versiones.map((v) => (
-            <option key={v} value={v}>
-              {v}
+            <option key={v.idVersion} value={v.idVersion}>
+              {v.nombreVersion}
             </option>
           ))}
         </select>
