@@ -23,7 +23,7 @@ export const addTicket = async (ticket) => {
 
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error("Error al agregar ticket: " + errorText);
+    throw new Error("Error al agregar ticket:  " + errorText);
   }
 
   return await res.text();
