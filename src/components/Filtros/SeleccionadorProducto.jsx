@@ -1,22 +1,20 @@
 import { useEffect, useState } from "react";
 import { getProductos } from "@/api/productos";
-
+import { Package } from "lucide-react";
 
 export default function SeleccionadorProducto({
   onSeleccionarProducto,
   productoSeleccionado,
-  
 }) {
   const [productos, setProductos] = useState([]);
   const [paginaActual, setPaginaActual] = useState(1);
-  const productosPorPagina = 12;
+  const productosPorPagina = 9;
 
   useEffect(() => {
     const fetchProductos = async () => {
       const data = await getProductos();
       setProductos(data);
     };
-
     fetchProductos();
   }, []);
 
@@ -34,9 +32,9 @@ export default function SeleccionadorProducto({
 
   const manejarSeleccion = (id) => {
     if (productoSeleccionado === id) {
-      onSeleccionarProducto(""); // Deselecciona
+      onSeleccionarProducto("");
     } else {
-      onSeleccionarProducto(id); // Selecciona
+      onSeleccionarProducto(id);
     }
   };
 
@@ -49,8 +47,7 @@ export default function SeleccionadorProducto({
   };
 
   return (
-    <div className= {productoSeleccionado ? "" :"flex flex-col min-h-[70vh] justify-between"}>
-    
+    <div className={productoSeleccionado ? "" : "flex flex-col min-h-[70vh] justify-between"}>
       <div className={productoSeleccionado ? "" : "flex-grow"}>
         <div
           className={`${
@@ -62,28 +59,30 @@ export default function SeleccionadorProducto({
           {productosAMostrar.map((producto) => (
             <div
               key={producto.id}
-              className={`p-4 rounded border shadow hover:shadow-md cursor-pointer transition-all w-full max-w-sm
+              className={`p-5 rounded-lg border shadow-sm transition-all w-full max-w-sm cursor-pointer
                 ${
                   productoSeleccionado === producto.id
                     ? "border-blue-500 bg-blue-50"
-                    : "border-gray-300"
+                    : "border-gray-200 hover:bg-slate-50"
                 }`}
               onClick={() => manejarSeleccion(producto.id)}
             >
+              <div className="flex items-center justify-center mb-2 text-blue-400">
+                <Package className="w-6 h-6" />
+              </div>
+
               <h3 className="text-lg font-semibold text-slate-700 text-center">
                 {producto.nombre}
               </h3>
-              <p className="text-sm text-slate-500 text-center">
+
+              <p className="text-sm text-blue-500 text-center mt-1">
                 Versiones: {producto.versiones.length}
               </p>
             </div>
           ))}
         </div>
-
-      
       </div>
 
-    
       {!productoSeleccionado && totalPaginas > 1 && (
         <div className="flex justify-center items-center gap-4 mt-5 mb-4">
           <button
@@ -93,7 +92,7 @@ export default function SeleccionadorProducto({
           >
             Anterior
           </button>
-          <span className="text-sm font-semibold">
+          <span className="text-sm font-semibold text-slate-600">
             Página {paginaActual} de {totalPaginas}
           </span>
           <button

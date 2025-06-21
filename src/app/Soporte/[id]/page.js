@@ -46,7 +46,7 @@ const VistaTicket = () => {
   return (
     <div className="p-10">
       <div className="w-[90%] mx-auto">
-        {/* Botón Volver */}
+       
         <button
           onClick={() => router.back()}
           className="flex items-center text-sm text-gray-500 hover:text-gray-700 transition mb-4"
@@ -55,10 +55,10 @@ const VistaTicket = () => {
           Volver
         </button>
 
-        {/* Título alineado */}
+      
         <h2 className="text-4xl text-slate-500 mb-6">{`Soporte / Producto / ${producto}`}</h2>
 
-        {/* Contenido */}
+       
         <div className="space-y-8">
           <TicketHeader ticket={ticket} />
 

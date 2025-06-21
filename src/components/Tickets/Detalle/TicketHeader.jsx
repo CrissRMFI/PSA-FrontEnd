@@ -3,8 +3,7 @@
 import ModalEditarTicket from "@/components/Tickets/EditarTicket/ModalEditarTicket";
 import { useState } from "react";
 import { updateTicket, deleteTicket } from "@/api/tickets";
-import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+
 
 export default function TicketHeader({ ticket }) {
   

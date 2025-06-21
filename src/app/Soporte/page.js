@@ -46,9 +46,10 @@ export default function SoportePage() {
   };
 
   return (
-    <div className="p-10 mb-20">
-      {/* Botón Volver */}
-      <div className="mb-3">
+    <div className="p-10 mb-1">
+
+    
+      <div className="">
         <button
           onClick={() => {
             localStorage.removeItem(STORAGE_KEY_PRODUCTO);
@@ -74,33 +75,30 @@ export default function SoportePage() {
         </button>
       </div>
 
-      {/* Título */}
-      <h2 className="text-4xl text-slate-500 mb-6">Soporte / Productos</h2>
+      <h2 className="text-4xl text-slate-500 mb-2">Soporte / Productos</h2>
 
-      {/* Barra de búsqueda y botón crear */}
-      {!productoSeleccionado && !versionSeleccionada && (
-        <div className="flex items-center justify-between mb-5">
+           {!productoSeleccionado && !versionSeleccionada && (
+        <div className="flex items-center mb-3 w-full">
           <input
             type="text"
             placeholder="Buscar productos por nombre..."
-            className="border border-gray-300 rounded px-4 py-2 h-10 w-96 shadow-sm"
+            className="border border-gray-300 rounded px-4 py-2 h-10 w-full max-w-[400px] shadow-sm"
             value={filtroNombreProducto}
             onChange={(e) => setFiltroNombreProducto(e.target.value)}
           />
-          <div className="ml-4">
+          <div className="ml-auto">
             <BotonNuevoTicket openModal={() => setModalOpen(true)} />
           </div>
         </div>
       )}
 
-      {/* Si hay selección, mostrar el botón en el mismo lugar */}
+
       {productoSeleccionado || versionSeleccionada ? (
         <div className="flex justify-end mb-5">
           <BotonNuevoTicket openModal={() => setModalOpen(true)} />
         </div>
       ) : null}
 
-      {/* Modal */}
       {modalOpen && (
         <ModalNuevoTicket
           isOpen={modalOpen}
