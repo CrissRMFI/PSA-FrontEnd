@@ -48,7 +48,7 @@ export default function SoportePage() {
   return (
     <div className="p-10 mb-1">
 
-    
+{!productoSeleccionado && !versionSeleccionada &&(
       <div className="">
         <button
           onClick={() => {
@@ -73,7 +73,7 @@ export default function SoportePage() {
           </svg>
           Volver
         </button>
-      </div>
+      </div>)}
 
       <h2 className="text-4xl text-slate-500 mb-2">Soporte / Productos</h2>
 
