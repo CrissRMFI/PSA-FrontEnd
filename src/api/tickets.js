@@ -23,7 +23,7 @@ export const addTicket = async (ticket) => {
 
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error("Error al agregar ticket: " + errorText);
+    throw new Error("Error al agregar ticket:  " + errorText);
   }
 
   return await res.text();
@@ -59,4 +59,17 @@ export const updateTicket = async (internalId, data) => {
   }
 
   return "Ticket actualizado correctamente";
+};
+
+export const deleteTicket = async (id) => {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error("Error al eliminar ticket: " + errorText);
+  }
+
+  return await res.text(); 
 };
