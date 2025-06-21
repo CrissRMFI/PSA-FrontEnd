@@ -5,6 +5,7 @@ import { proyectosService } from './services/proyectosService';
 import ProyectoForm from './components/ProyectoForm';
 import ProyectoCard from './components/ProyectoCard';
 import DeleteConfirm from './components/DeleteConfirm';
+import TicketBadge from './components/TicketBadge'; // 🆕 Importar TicketBadge
 
 export default function ProyectosPage() {
   const [proyectos, setProyectos] = useState([]);
@@ -144,7 +145,7 @@ export default function ProyectosPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Gestión de Proyectos</h1>
-          <p className="text-gray-600 mt-2">Administra tus proyectos, fases y tareas desde un solo lugar</p>
+          <p className="text-gray-600 mt-2">Administra tus proyectos, fases, tareas y tickets desde un solo lugar</p>
         </div>
         <button
           onClick={openCreateForm}
@@ -207,8 +208,8 @@ export default function ProyectosPage() {
         </div>
       )}
 
-      {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {/* Estadísticas expandidas con Tickets */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-800">Total Proyectos</h3>
           <p className="text-3xl font-bold text-blue-600">{estadisticas.total}</p>
@@ -225,6 +226,9 @@ export default function ProyectosPage() {
           <h3 className="text-lg font-semibold text-gray-800">Cerrados</h3>
           <p className="text-3xl font-bold text-gray-600">{estadisticas.cerrados}</p>
         </div>
+        
+        {/* 🆕 Nuevo: TicketBadge integrado */}
+        <TicketBadge />
       </div>
 
       {/* Lista de proyectos */}
