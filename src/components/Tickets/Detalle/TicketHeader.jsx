@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function TicketHeader({ ticket }) {
-  const router = useRouter();
+  
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSave = async (data) => {
@@ -24,19 +24,10 @@ export default function TicketHeader({ ticket }) {
   };
   
 
-  const handleGoBack = () => {
-    router.back();
-  };
 
   return (
     <div className="mt-6 space-y-4">
-      <button
-        className="flex items-center text-sm text-gray-500 hover:text-gray-700 transition"
-        onClick={handleGoBack}
-      >
-        <ArrowLeft className="w-4 h-4 mr-1" />
-        Volver
-      </button>
+   
 
       <h1 className="text-2xl font-bold text-gray-800">{ticket.nombre}</h1>
 
