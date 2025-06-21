@@ -14,6 +14,7 @@ export default function SoportePage() {
   const [productoSeleccionado, setProductoSeleccionado] = useState("");
   const [versionSeleccionada, setVersionSeleccionada] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [actualizarTickets, setActualizarTickets] = useState(false);
 
   // Al cargar la página, restaurar estado desde localStorage
   useEffect(() => {
@@ -38,6 +39,12 @@ export default function SoportePage() {
     localStorage.setItem(STORAGE_KEY_VERSION, version);
   };
 
+  
+  const handleTicketCreado = (ticketNuevo) => {
+    setActualizarTickets((prev) => !prev);
+    setModalOpen(false);
+  };
+
   return (
     <div className="p-10 mb-20">
       <h2 className="text-4xl text-slate-500 mb-10">Soporte / Productos</h2>
@@ -47,7 +54,11 @@ export default function SoportePage() {
       </div>
 
       {modalOpen && (
-        <ModalNuevoTicket isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+        <ModalNuevoTicket
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onTicketCreado={handleTicketCreado}
+        />
       )}
 
       <SeleccionadorProducto
@@ -64,7 +75,11 @@ export default function SoportePage() {
       )}
 
       {productoSeleccionado && versionSeleccionada && (
-        <TicketContainer producto={productoSeleccionado} version={versionSeleccionada} />
+        <TicketContainer
+          producto={productoSeleccionado}
+          version={versionSeleccionada}
+          key={`${productoSeleccionado}-${versionSeleccionada}-${actualizarTickets}`}
+        />
       )}
     </div>
   );
