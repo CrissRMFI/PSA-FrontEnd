@@ -48,8 +48,8 @@ export default function TareasPage() {
       setProyecto(proyectoData);
       setFases(proyectoData.fases || []);
       
-      // Cargar tareas del proyecto
-      const tareasData = await proyectosService.getTareasByProyecto(proyectoId);
+      // ✅ CAMBIO: Usar nuevo método que incluye tickets
+      const tareasData = await proyectosService.getTareasConTickets(proyectoId);
       setTareas(tareasData);
       
     } catch (err) {
@@ -92,7 +92,7 @@ export default function TareasPage() {
 
   const loadTareas = async () => {
     try {
-      const tareasData = await proyectosService.getTareasByProyecto(proyectoId);
+      const tareasData = await proyectosService.getTareasConTickets(proyectoId);
       setTareas(tareasData);
     } catch (err) {
       setError('Error al cargar las tareas');

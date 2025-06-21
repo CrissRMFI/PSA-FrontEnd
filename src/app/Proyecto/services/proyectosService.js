@@ -403,6 +403,45 @@ class ProyectosService {
   }
 
   // ================================
+  // TAREAS CON TICKETS (NUEVO)
+  // ================================
+
+  async getTareasConTickets(proyectoId) {
+    try {
+      // Cargar tareas y tickets en paralelo
+      const [tareasResponse, ticketsResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/proyectos/${proyectoId}/tareas`),
+        fetch(`${API_BASE_URL}/tickets`)
+      ]);
+      
+      if (!tareasResponse.ok) throw new Error('Error al obtener tareas');
+      if (!ticketsResponse.ok) throw new Error('Error al obtener tickets');
+      
+      const tareas = await tareasResponse.json();
+      const tickets = await ticketsResponse.json();
+      
+      // ✅ Crear mapa ticket -> tareas para mejor performance
+      const ticketPorTarea = new Map();
+      tickets.forEach(ticket => {
+        ticket.tareasAsignadas?.forEach(tarea => {
+          ticketPorTarea.set(tarea.id, ticket);
+        });
+      });
+      
+      // ✅ Agregar ticketAsociado a cada tarea
+      const tareasConTickets = tareas.map(tarea => ({
+        ...tarea,
+        ticketAsociado: ticketPorTarea.get(tarea.idTarea) || null
+      }));
+      
+      return tareasConTickets;
+    } catch (error) {
+      console.error('Error en getTareasConTickets:', error);
+      throw error;
+    }
+  }
+
+  // ================================
   // GESTIÓN DE RECURSOS
   // ================================
 

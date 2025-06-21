@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function TareaCard({ 
   tarea, 
   onEdit, 
@@ -126,6 +128,47 @@ export default function TareaCard({
           </div>
         </div>
 
+        {/* 🆕 Información del ticket asignado */}
+        {tarea.ticketAsociado && (
+          <div className="mb-4">
+            <span className="text-sm text-gray-500 mb-2 block">Ticket asignado:</span>
+            <div className="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-full">
+                  <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-800 text-sm">
+                    {tarea.ticketAsociado.codigo}
+                  </p>
+                  <p className="text-gray-600 text-xs line-clamp-1">
+                    {tarea.ticketAsociado.nombre}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  tarea.ticketAsociado.prioridad === 'HIGH_PRIORITY' ? 'bg-red-100 text-red-600' :
+                  tarea.ticketAsociado.prioridad === 'MEDIUM_PRIORITY' ? 'bg-yellow-100 text-yellow-600' :
+                  'bg-green-100 text-green-600'
+                }`}>
+                  {tarea.ticketAsociado.prioridad === 'HIGH_PRIORITY' ? 'Alta' :
+                   tarea.ticketAsociado.prioridad === 'MEDIUM_PRIORITY' ? 'Media' : 'Baja'}
+                </span>
+                <Link
+                  href="/Proyecto/tickets"
+                  className="text-orange-600 hover:text-orange-800 text-xs font-medium"
+                  title="Ver gestión de tickets"
+                >
+                  Ver →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Fases asignadas */}
         {tarea.fases && tarea.fases.length > 0 && (
           <div className="mb-4">
@@ -203,6 +246,16 @@ export default function TareaCard({
                   .sort((a, b) => a.orden - b.orden)
                   .map((_, index) => index + 1)
                   .join(', ')}
+              </span>
+            )}
+            {/* 🆕 Indicador de ticket */}
+            {tarea.ticketAsociado ? (
+              <span className="text-orange-600 font-medium">
+                🎫 Con ticket
+              </span>
+            ) : (
+              <span className="text-gray-400">
+                Sin ticket
               </span>
             )}
           </div>

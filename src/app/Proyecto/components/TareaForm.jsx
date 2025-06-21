@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import RecursoSelector from './RecursoSelector';
+import TicketSelector from './TicketSelector'; // 🆕 Import del nuevo selector
 
 export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
     prioridad: 'MEDIA',
-    responsableRecursoId: '', // Nuevo campo para recurso
+    responsableRecursoId: '', // Campo para recurso
+    ticketAsociadoId: '', // 🆕 Campo para ticket
     fechaInicio: '',
     fechaFinEstimada: '',
     faseIds: [] // Para tareas multifase
@@ -25,6 +27,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         descripcion: tarea.descripcion || '',
         prioridad: tarea.prioridad || 'MEDIA',
         responsableRecursoId: tarea.responsableRecursoId || '', // ID del recurso si existe
+        ticketAsociadoId: tarea.ticketAsociado?.id?.toString() || '', // 🆕 ID del ticket si existe
         fechaInicio: tarea.fechaInicio || '',
         fechaFinEstimada: tarea.fechaFinEstimada || '',
         faseIds: faseIds
@@ -37,6 +40,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         descripcion: '',
         prioridad: 'MEDIA',
         responsableRecursoId: '',
+        ticketAsociadoId: '', // 🆕 Sin ticket por defecto
         fechaInicio: proyecto?.fechaInicio || '',
         fechaFinEstimada: proyecto?.fechaFinEstimada || '',
         faseIds: []
@@ -71,6 +75,22 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
       setErrors(prev => ({
         ...prev,
         responsableRecursoId: ''
+      }));
+    }
+  };
+
+  // 🆕 Handler para cambio de ticket
+  const handleTicketChange = (ticketAsociadoId) => {
+    setFormData(prev => ({
+      ...prev,
+      ticketAsociadoId
+    }));
+    
+    // Limpiar error del ticket si existe
+    if (errors.ticketAsociadoId) {
+      setErrors(prev => ({
+        ...prev,
+        ticketAsociadoId: ''
       }));
     }
   };
@@ -162,6 +182,26 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
       if (formData.responsableRecursoId) {
         dataToSubmit.responsableRecursoId = formData.responsableRecursoId;
       }
+
+      // 🔧 CAMBIO: Solo incluir ticketAsociadoId si hay un cambio real
+      const ticketOriginal = tarea?.ticketAsociado?.id?.toString() || '';
+      const ticketNuevo = formData.ticketAsociadoId || '';
+      
+      if (ticketOriginal !== ticketNuevo) {
+        // Solo incluir si hay un cambio
+        if (ticketNuevo !== '') {
+          dataToSubmit.ticketAsociadoId = parseInt(ticketNuevo);
+          console.log('🎫 Cambiando ticket a ID:', dataToSubmit.ticketAsociadoId);
+        } else {
+          // ⚠️ TEMPORAL: No enviar null para evitar borrado por cascada
+          console.log('🎫 No enviando ticketAsociadoId para evitar borrado por cascada');
+          // dataToSubmit.ticketAsociadoId = null; // Comentado temporalmente
+        }
+      } else {
+        console.log('🎫 Sin cambios en ticket, no se incluye en el payload');
+      }
+
+      console.log('📤 Datos a enviar:', dataToSubmit);
       
       await onSubmit(dataToSubmit);
     } catch (error) {
@@ -227,7 +267,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
 
       {/* Responsable y Prioridad */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Responsable - AHORA CON RECURSO SELECTOR */}
+        {/* Responsable - CON RECURSO SELECTOR */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Responsable *
@@ -264,6 +304,23 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
             <option value="ALTA">Alta</option>
           </select>
         </div>
+      </div>
+
+      {/* 🆕 Selector de Ticket */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Ticket de Soporte
+        </label>
+        <TicketSelector
+          value={formData.ticketAsociadoId}
+          onChange={handleTicketChange}
+          error={errors.ticketAsociadoId}
+          disabled={isSubmitting}
+          placeholder="Seleccionar ticket de soporte (opcional)"
+        />
+        {errors.ticketAsociadoId && (
+          <p className="text-red-600 text-sm mt-1">{errors.ticketAsociadoId}</p>
+        )}
       </div>
 
       {/* Fechas */}
@@ -389,7 +446,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         )}
       </div>
 
-      {/* Resumen de selección */}
+      {/* 🆕 Resumen de selección actualizado */}
       {formData.faseIds.length > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <h4 className="font-medium text-green-800 mb-2">
@@ -399,6 +456,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
             <p>• Será asignada a {formData.faseIds.length} fase{formData.faseIds.length > 1 ? 's' : ''}</p>
             <p>• Responsable: {formData.responsableRecursoId ? 'Recurso seleccionado' : 'Sin asignar'}</p>
             <p>• Prioridad: {formData.prioridad}</p>
+            <p>• Ticket: {formData.ticketAsociadoId ? 'Ticket asignado' : 'Sin ticket'}</p>
             {formData.faseIds.length > 1 && (
               <p>• ⭐ Tarea multifase - aparecerá en múltiples etapas</p>
             )}
@@ -413,6 +471,17 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
           <div className="text-green-700 text-sm">
             <p>La tarea será asignada al recurso seleccionado como responsable.</p>
             <p>Podrás cambiar la asignación posteriormente desde la gestión de tareas.</p>
+          </div>
+        </div>
+      )}
+
+      {/* 🆕 Previsualización del ticket seleccionado */}
+      {formData.ticketAsociadoId && (
+        <div className="bg-orange-50 p-4 rounded-lg">
+          <h4 className="font-medium text-orange-800 mb-2">🎫 Ticket seleccionado:</h4>
+          <div className="text-orange-700 text-sm">
+            <p>Esta tarea estará vinculada al ticket de soporte seleccionado.</p>
+            <p>El progreso de la tarea se reflejará en el estado del ticket automáticamente.</p>
           </div>
         </div>
       )}
