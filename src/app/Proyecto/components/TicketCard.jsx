@@ -25,8 +25,10 @@ export default function TicketCard({
   };
 
   const getColorBorde = () => {
-    switch (ticket.estado) {
+    const estadoReal = getEstadoReal();
+    switch (estadoReal) {
       case 'RESUELTO': return 'border-green-500';
+      case 'COMPLETO': return 'border-emerald-500';
       case 'EN_PROCESO': return 'border-blue-500';
       case 'ASIGNADO': return 'border-purple-500';
       default: return 'border-yellow-500'; // RECIBIDO
@@ -46,17 +48,58 @@ export default function TicketCard({
 
   // ✅ NUEVO: Función para determinar si puede asignar tareas
   const puedeAsignarTareas = () => {
-    return ticket.estado === 'RECIBIDO' || ticket.estado === 'ASIGNADO';
+    // Si no está resuelto ni en proceso, puede asignar tareas
+    return ticket.estado !== 'RESUELTO' && ticket.estado !== 'EN_PROCESO';
   };
 
-  // ✅ NUEVO: Texto dinámico del botón
+  // ✅ NUEVO: Texto dinámico del botón basado en si tiene tareas asignadas
   const getTextoBotonAsignar = () => {
-    if (ticket.estado === 'RECIBIDO') {
-      return 'Asignar Tareas';
-    } else if (ticket.estado === 'ASIGNADO') {
+    if (ticket.asignado && ticket.cantidadTareasAsignadas > 0) {
       return 'Asignar Más';
+    } else {
+      return 'Asignar Tareas';
     }
-    return 'Asignar';
+  };
+
+  // ✅ NUEVO: Estado real basado en datos actualizados Y completitud de tareas
+  const getEstadoReal = () => {
+    // Si está resuelto explícitamente, mantener como resuelto
+    if (ticket.estado === 'RESUELTO') return 'RESUELTO';
+    
+    // Si está en proceso explícitamente, mantener como en proceso
+    if (ticket.estado === 'EN_PROCESO') return 'EN_PROCESO';
+    
+    // ✅ NUEVO: Si tiene tareas asignadas, verificar si todas están completas
+    if (ticket.asignado && ticket.cantidadTareasAsignadas > 0) {
+      // Si todas las tareas están completas, marcar como COMPLETO
+      if (ticket.tareasAsignadas && ticket.tareasAsignadas.length > 0) {
+        const todasCompletas = ticket.tareasAsignadas.every(tarea => 
+          tarea.estado === 'COMPLETADA' || tarea.estado === 'TERMINADA' || tarea.estado === 'FINALIZADA'
+        );
+        
+        if (todasCompletas) {
+          return 'COMPLETO';
+        }
+      }
+      
+      return 'ASIGNADO';
+    } else {
+      return 'RECIBIDO';
+    }
+  };
+
+  // ✅ NUEVO: Texto de estado real con soporte para COMPLETO
+  const getTextoEstadoReal = () => {
+    const estadoReal = getEstadoReal();
+    if (estadoReal === 'COMPLETO') return 'Completo';
+    return ticketsService.obtenerTextoEstado(estadoReal);
+  };
+
+  // ✅ NUEVO: Color de estado real con soporte para COMPLETO
+  const getColorEstadoReal = () => {
+    const estadoReal = getEstadoReal();
+    if (estadoReal === 'COMPLETO') return 'bg-emerald-100 text-emerald-800';
+    return ticketsService.obtenerColorPorEstado(estadoReal);
   };
 
   return (
@@ -78,8 +121,8 @@ export default function TicketCard({
 
             {/* Estados y prioridad */}
             <div className="flex items-center space-x-2 mb-3">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${ticketsService.obtenerColorPorEstado(ticket.estado)}`}>
-                {ticketsService.obtenerTextoEstado(ticket.estado)}
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getColorEstadoReal()}`}>
+                {getTextoEstadoReal()}
               </span>
               <span className={`px-2 py-1 rounded-full text-xs font-medium border ${ticketsService.obtenerColorPorPrioridad(ticket.prioridad)}`}>
                 {ticketsService.obtenerTextoprioridad(ticket.prioridad)} PRIORIDAD
@@ -115,9 +158,9 @@ export default function TicketCard({
                   onClick={handleAsignar}
                   disabled={loading}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    ticket.estado === 'RECIBIDO' 
-                      ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-                      : 'bg-purple-100 text-purple-600 hover:bg-purple-200'
+                    ticket.asignado && ticket.cantidadTareasAsignadas > 0
+                      ? 'bg-purple-100 text-purple-600 hover:bg-purple-200'
+                      : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                   }`}
                   title={`${getTextoBotonAsignar()} al ticket ${ticket.codigo}`}
                 >
@@ -125,6 +168,8 @@ export default function TicketCard({
                 </button>
               )}
 
+              {/* ✅ ELIMINAR: Botones de edición y borrado comentados */}
+              {/* 
               {onEdit && (
                 <button
                   onClick={() => onEdit(ticket)}
@@ -148,6 +193,7 @@ export default function TicketCard({
                   </svg>
                 </button>
               )}
+              */}
             </div>
           )}
         </div>
@@ -190,8 +236,27 @@ export default function TicketCard({
           </div>
         )}
 
+        {/* ✅ NUEVO: Indicador especial cuando todas las tareas están completas */}
+        {getEstadoReal() === 'COMPLETO' && (
+          <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-emerald-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <span className="text-sm text-emerald-700 font-medium block">
+                  🎉 ¡Todas las tareas completadas!
+                </span>
+                <span className="text-xs text-emerald-600">
+                  Este ticket está listo para ser resuelto
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ✅ NUEVO: Indicador de capacidad de asignación */}
-        {ticket.estado === 'ASIGNADO' && (
+        {ticket.asignado && ticket.cantidadTareasAsignadas > 0 && getEstadoReal() !== 'COMPLETO' && (
           <div className="mb-4 bg-purple-50 border border-purple-200 rounded-lg p-3">
             <div className="flex items-center">
               <svg className="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,27 +283,7 @@ export default function TicketCard({
           <p className="font-medium text-sm">{formatDate(ticket.fechaCreacion)}</p>
         </div>
 
-        {/* Progreso visual según estado */}
-        <div className="mb-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-1">
-            <span>Estado del Ticket</span>
-            <span>
-              {ticket.estado === 'RESUELTO' ? '100%' :
-               ticket.estado === 'EN_PROCESO' ? '75%' :
-               ticket.estado === 'ASIGNADO' ? '50%' : '25%'}
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full transition-all duration-300 ${
-                ticket.estado === 'RESUELTO' ? 'bg-green-500 w-full' :
-                ticket.estado === 'EN_PROCESO' ? 'bg-blue-500 w-3/4' :
-                ticket.estado === 'ASIGNADO' ? 'bg-purple-500 w-1/2' :
-                'bg-yellow-500 w-1/4'
-              }`}
-            ></div>
-          </div>
-        </div>
+
 
         {/* Footer con información adicional */}
         <div className="flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
@@ -252,6 +297,14 @@ export default function TicketCard({
           
           <div className="flex items-center space-x-2">
             {/* Indicador de estado con icono */}
+            {getEstadoReal() === 'COMPLETO' && (
+              <div className="flex items-center text-emerald-600">
+                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>Completo</span>
+              </div>
+            )}
             {ticket.estado === 'RESUELTO' && (
               <div className="flex items-center text-green-600">
                 <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -266,7 +319,7 @@ export default function TicketCard({
                 <span>En Proceso</span>
               </div>
             )}
-            {ticket.estado === 'ASIGNADO' && (
+            {ticket.estado === 'ASIGNADO' && getEstadoReal() !== 'COMPLETO' && (
               <div className="flex items-center text-purple-600">
                 <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />

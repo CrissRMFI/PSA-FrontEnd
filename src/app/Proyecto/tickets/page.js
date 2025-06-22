@@ -182,7 +182,7 @@ export default function TicketsPage() {
 
   // Filtrar tickets según criterios
   const ticketsFiltrados = tickets.filter(ticket => {
-    if (filtros.estado && ticket.estado !== filtros.estado) return false;
+    if (filtros.estado && calcularEstadoReal(ticket) !== filtros.estado) return false;
     if (filtros.prioridad && ticket.prioridad !== filtros.prioridad) return false;
     if (filtros.severidad && ticket.severidad !== filtros.severidad) return false;
     
@@ -206,12 +206,24 @@ export default function TicketsPage() {
   });
 
   // Métricas
+  const calcularEstadoReal = (ticket) => {
+    if (ticket.estado === 'RESUELTO') return 'RESUELTO';
+    if (ticket.estado === 'EN_PROCESO') return 'EN_PROCESO';
+    
+    // Para RECIBIDO/ASIGNADO, usar campos actualizados
+    if (ticket.asignado && ticket.cantidadTareasAsignadas > 0) {
+      return 'ASIGNADO';
+    } else {
+      return 'RECIBIDO';
+    }
+  };
+
   const metricas = {
     total: tickets.length,
-    pendientes: tickets.filter(t => t.estado === 'RECIBIDO').length,
-    asignados: tickets.filter(t => t.estado === 'ASIGNADO').length,
-    enProceso: tickets.filter(t => t.estado === 'EN_PROCESO').length,
-    resueltos: tickets.filter(t => t.estado === 'RESUELTO').length,
+    pendientes: tickets.filter(t => calcularEstadoReal(t) === 'RECIBIDO').length,
+    asignados: tickets.filter(t => calcularEstadoReal(t) === 'ASIGNADO').length,
+    enProceso: tickets.filter(t => calcularEstadoReal(t) === 'EN_PROCESO').length,
+    resueltos: tickets.filter(t => calcularEstadoReal(t) === 'RESUELTO').length,
   };
 
   // Tareas disponibles para asignar (sin ticket asociado)

@@ -20,11 +20,35 @@ export default function TicketBadge() {
     cargarMetricas();
   }, []);
 
+  // ✅ CAMBIO: Calcular métricas correctas
+  const calcularEstadoReal = (ticket) => {
+    if (ticket.estado === 'RESUELTO') return 'RESUELTO';
+    if (ticket.estado === 'EN_PROCESO') return 'EN_PROCESO';
+    
+    // Para RECIBIDO/ASIGNADO, usar campos actualizados
+    if (ticket.asignado && ticket.cantidadTareasAsignadas > 0) {
+      return 'ASIGNADO';
+    } else {
+      return 'RECIBIDO';
+    }
+  };
+
   const cargarMetricas = async () => {
     try {
       setError(null);
-      const metricasData = await ticketsService.obtenerMetricas();
-      setMetricas(metricasData);
+      
+      // ✅ CAMBIO: Obtener tickets y calcular métricas nosotros mismos
+      const tickets = await ticketsService.obtenerTodos();
+      
+      const metricasCorrectas = {
+        total: tickets.length,
+        pendientes: tickets.filter(t => calcularEstadoReal(t) === 'RECIBIDO').length,
+        asignados: tickets.filter(t => calcularEstadoReal(t) === 'ASIGNADO').length,
+        enProceso: tickets.filter(t => calcularEstadoReal(t) === 'EN_PROCESO').length,
+        resueltos: tickets.filter(t => calcularEstadoReal(t) === 'RESUELTO').length,
+      };
+      
+      setMetricas(metricasCorrectas);
     } catch (error) {
       console.error('Error al cargar métricas de tickets:', error);
       setError(error.message);
