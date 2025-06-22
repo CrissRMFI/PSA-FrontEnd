@@ -104,13 +104,11 @@ export default function TicketSelector({
   return (
     <div className="relative">
       {/* Campo selector */}
-      <button
-        type="button"
+      <div
         onClick={() => !disabled && setIsOpen(!isOpen)}
-        disabled={disabled}
-        className={`w-full px-3 py-2 border rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+        className={`w-full px-3 py-2 border rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 ${
           error ? 'border-red-500' : 'border-gray-300'
-        } ${disabled ? 'bg-gray-100 text-gray-500' : 'bg-white hover:bg-gray-50'} transition-colors`}
+        } ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white hover:bg-gray-50'} transition-colors`}
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
@@ -141,19 +139,18 @@ export default function TicketSelector({
           
           <div className="flex items-center space-x-1">
             {ticketSeleccionado && !disabled && (
-              <button
-                type="button"
+              <div
                 onClick={(e) => {
                   e.stopPropagation();
                   handleClear();
                 }}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                className="p-1 text-gray-400 hover:text-gray-600 rounded cursor-pointer"
                 title="Quitar ticket"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-              </button>
+              </div>
             )}
             
             {!disabled && (
@@ -163,7 +160,7 @@ export default function TicketSelector({
             )}
           </div>
         </div>
-      </button>
+      </div>
 
       {/* Dropdown */}
       {isOpen && !disabled && (
@@ -183,10 +180,9 @@ export default function TicketSelector({
           {/* Lista de tickets */}
           <div className="max-h-60 overflow-y-auto">
             {/* Opción "Sin ticket" */}
-            <button
-              type="button"
+            <div
               onClick={() => handleClear()}
-              className="w-full px-3 py-3 text-left hover:bg-gray-50 border-b border-gray-100 transition-colors"
+              className="w-full px-3 py-3 text-left hover:bg-gray-50 border-b border-gray-100 transition-colors cursor-pointer"
             >
               <div className="flex items-center space-x-3">
                 <div className="flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full">
@@ -196,7 +192,7 @@ export default function TicketSelector({
                 </div>
                 <span className="text-gray-600 font-medium">Sin ticket asignado</span>
               </div>
-            </button>
+            </div>
 
             {/* Tickets disponibles */}
             {ticketsFiltrados.length === 0 ? (
@@ -205,11 +201,10 @@ export default function TicketSelector({
               </div>
             ) : (
               ticketsFiltrados.map((ticket) => (
-                <button
+                <div
                   key={ticket.id}
-                  type="button"
                   onClick={() => handleSelect(ticket.id)}
-                  className={`w-full px-3 py-3 text-left hover:bg-gray-50 border-b border-gray-100 transition-colors ${
+                  className={`w-full px-3 py-3 text-left hover:bg-gray-50 border-b border-gray-100 transition-colors cursor-pointer ${
                     ticket.id.toString() === value?.toString() ? 'bg-blue-50 border-blue-200' : ''
                   }`}
                 >
@@ -241,7 +236,7 @@ export default function TicketSelector({
                       </span>
                     </div>
                   </div>
-                </button>
+                </div>
               ))
             )}
           </div>

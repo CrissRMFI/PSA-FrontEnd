@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { proyectosService } from '../../services/proyectosService';
+import { ticketsService } from '../../services/ticketsService'; // 🆕 Importar ticketsService
 import TareaCard from '../../components/TareaCard';
 import TareaForm from '../../components/TareaForm';
 import DeleteConfirm from '../../components/DeleteConfirm';
@@ -154,6 +155,23 @@ export default function TareasPage() {
     } catch (err) {
       setError('Error al cambiar el estado de la tarea');
       console.error(err);
+    }
+  };
+
+  // 🆕 Nueva función para desasignar tickets
+  const handleDesasignarTicket = async (tareaId, ticketId) => {
+    try {
+      // Llamar al service para desasignar el ticket
+      await ticketsService.desasignarTareas(ticketId, [tareaId]);
+      
+      // Recargar tareas para reflejar el cambio
+      await loadTareas();
+      
+      console.log('Ticket desasignado exitosamente de la tarea:', tareaId);
+      
+    } catch (error) {
+      console.error('Error al desasignar ticket:', error);
+      throw error; // Para que TareaCard maneje el error visual
     }
   };
 
@@ -357,6 +375,7 @@ export default function TareasPage() {
               onEdit={openEditForm}
               onDelete={setDeletingTarea}
               onCambiarEstado={handleCambiarEstado}
+              onDesasignarTicket={handleDesasignarTicket} // 🆕 Pasar la nueva prop
               getEstadoColor={getEstadoColor}
               getPrioridadColor={getPrioridadColor}
               proyectoId={proyectoId}

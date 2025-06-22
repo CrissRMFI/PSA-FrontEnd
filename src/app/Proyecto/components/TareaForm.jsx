@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import RecursoSelector from './RecursoSelector';
-import TicketSelector from './TicketSelector'; // 🆕 Import del nuevo selector
+import TicketSelector from './TicketSelector';
 
 export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
@@ -168,7 +168,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
 
     setIsSubmitting(true);
     try {
-      // Preparar datos para envío
+      // ✅ PASO 1: Preparar datos para crear/editar la tarea (SIN TICKET)
       const dataToSubmit = {
         titulo: formData.titulo,
         descripcion: formData.descripcion,
@@ -183,29 +183,59 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         dataToSubmit.responsableRecursoId = formData.responsableRecursoId;
       }
 
-      // 🔧 CAMBIO: Solo incluir ticketAsociadoId si hay un cambio real
+      console.log('📤 PASO 1: Creando/editando tarea sin ticket:', dataToSubmit);
+      
+      // ✅ PASO 1: Crear/editar la tarea
+      const tareaResult = await onSubmit(dataToSubmit);
+      
+      // ✅ PASO 2: Si hay ticket seleccionado, asignarlo después
       const ticketOriginal = tarea?.ticketAsociado?.id?.toString() || '';
       const ticketNuevo = formData.ticketAsociadoId || '';
       
       if (ticketOriginal !== ticketNuevo) {
-        // Solo incluir si hay un cambio
-        if (ticketNuevo !== '') {
-          dataToSubmit.ticketAsociadoId = parseInt(ticketNuevo);
-          console.log('🎫 Cambiando ticket a ID:', dataToSubmit.ticketAsociadoId);
-        } else {
-          // ⚠️ TEMPORAL: No enviar null para evitar borrado por cascada
-          console.log('🎫 No enviando ticketAsociadoId para evitar borrado por cascada');
-          // dataToSubmit.ticketAsociadoId = null; // Comentado temporalmente
+        console.log('🎫 PASO 2: Procesando cambio de ticket...');
+        
+        // Importar ticketsService dinámicamente para evitar problemas de dependencias
+        const { ticketsService } = await import('../services/ticketsService');
+        
+        // Obtener ID de la tarea (puede venir del resultado o ser la tarea existente)
+        const tareaId = tareaResult?.idTarea || tarea?.idTarea;
+        
+        if (!tareaId) {
+          console.error('❌ No se pudo obtener el ID de la tarea para asignar ticket');
+          return;
         }
-      } else {
-        console.log('🎫 Sin cambios en ticket, no se incluye en el payload');
+        
+        // Si había ticket anterior, desasignarlo primero
+        if (ticketOriginal && ticketOriginal !== '') {
+          console.log('🔄 Desasignando ticket anterior:', ticketOriginal);
+          try {
+            await ticketsService.desasignarTareas(parseInt(ticketOriginal), [tareaId]);
+          } catch (error) {
+            console.warn('⚠️ Error al desasignar ticket anterior:', error);
+            // Continuar aunque falle la desasignación anterior
+          }
+        }
+        
+        // Si hay nuevo ticket, asignarlo
+        if (ticketNuevo && ticketNuevo !== '') {
+          console.log('✅ Asignando nuevo ticket:', ticketNuevo, 'a tarea:', tareaId);
+          try {
+            await ticketsService.asignarTareas(parseInt(ticketNuevo), [tareaId]);
+            console.log('🎉 Ticket asignado exitosamente!');
+          } catch (error) {
+            console.error('❌ Error al asignar ticket:', error);
+            // Mostrar error pero no fallar completamente
+            alert(`La tarea se ${tarea ? 'actualizó' : 'creó'} correctamente, pero hubo un error al asignar el ticket. Puedes asignarlo manualmente desde la lista de tareas.`);
+          }
+        }
       }
-
-      console.log('📤 Datos a enviar:', dataToSubmit);
       
-      await onSubmit(dataToSubmit);
+      console.log('✅ Proceso completado exitosamente');
+      
     } catch (error) {
-      console.error('Error al enviar formulario:', error);
+      console.error('❌ Error en el proceso:', error);
+      throw error; // Re-lanzar para que el componente padre maneje el error
     } finally {
       setIsSubmitting(false);
     }
@@ -321,6 +351,19 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         {errors.ticketAsociadoId && (
           <p className="text-red-600 text-sm mt-1">{errors.ticketAsociadoId}</p>
         )}
+        
+        {/* 🆕 Explicación del proceso */}
+        <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div className="flex items-start">
+            <svg className="w-4 h-4 text-blue-600 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div className="text-sm text-blue-800">
+              <p className="font-medium mb-1">Asignación de Ticket:</p>
+              <p>Si seleccionas un ticket, se asignará automáticamente después de {tarea ? 'actualizar' : 'crear'} la tarea.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Fechas */}
@@ -456,7 +499,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
             <p>• Será asignada a {formData.faseIds.length} fase{formData.faseIds.length > 1 ? 's' : ''}</p>
             <p>• Responsable: {formData.responsableRecursoId ? 'Recurso seleccionado' : 'Sin asignar'}</p>
             <p>• Prioridad: {formData.prioridad}</p>
-            <p>• Ticket: {formData.ticketAsociadoId ? 'Ticket asignado' : 'Sin ticket'}</p>
+            <p>• Ticket: {formData.ticketAsociadoId ? 'Se asignará automáticamente' : 'Sin ticket'}</p>
             {formData.faseIds.length > 1 && (
               <p>• ⭐ Tarea multifase - aparecerá en múltiples etapas</p>
             )}
@@ -480,8 +523,8 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         <div className="bg-orange-50 p-4 rounded-lg">
           <h4 className="font-medium text-orange-800 mb-2">🎫 Ticket seleccionado:</h4>
           <div className="text-orange-700 text-sm">
-            <p>Esta tarea estará vinculada al ticket de soporte seleccionado.</p>
-            <p>El progreso de la tarea se reflejará en el estado del ticket automáticamente.</p>
+            <p>Esta tarea se vinculará automáticamente al ticket de soporte seleccionado.</p>
+            <p>El proceso se realiza en dos pasos: primero se {tarea ? 'actualiza' : 'crea'} la tarea, luego se asigna el ticket.</p>
           </div>
         </div>
       )}
@@ -504,7 +547,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
           {isSubmitting ? (
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Guardando...
+              {formData.ticketAsociadoId ? 'Guardando y asignando ticket...' : 'Guardando...'}
             </div>
           ) : (
             tarea ? 'Actualizar Tarea' : 'Crear Tarea'

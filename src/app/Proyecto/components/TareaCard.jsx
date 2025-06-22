@@ -1,14 +1,18 @@
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function TareaCard({ 
   tarea, 
   onEdit, 
   onDelete, 
   onCambiarEstado, 
+  onDesasignarTicket, // 🆕 Nueva prop para desasignar ticket
   getEstadoColor, 
   getPrioridadColor, 
   proyectoId 
 }) {
+  const [desasignandoTicket, setDesasignandoTicket] = useState(false);
+
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
     return new Date(dateString).toLocaleDateString('es-ES');
@@ -46,6 +50,29 @@ export default function TareaCard({
     const proximoEstado = getProximoEstado();
     if (proximoEstado) {
       onCambiarEstado(tarea.idTarea, proximoEstado);
+    }
+  };
+
+  // 🆕 Handler para desasignar ticket
+  const handleDesasignarTicket = async () => {
+    if (!tarea.ticketAsociado || !onDesasignarTicket) return;
+    
+    // Confirmar acción
+    const confirmar = window.confirm(
+      `¿Estás seguro de que quieres desasignar el ticket "${tarea.ticketAsociado.codigo}" de esta tarea?\n\n` +
+      `Esto permitirá que el ticket pueda ser asignado a otras tareas.`
+    );
+    
+    if (!confirmar) return;
+
+    try {
+      setDesasignandoTicket(true);
+      await onDesasignarTicket(tarea.idTarea, tarea.ticketAsociado.id);
+    } catch (error) {
+      console.error('Error al desasignar ticket:', error);
+      alert('Error al desasignar el ticket. Inténtalo de nuevo.');
+    } finally {
+      setDesasignandoTicket(false);
     }
   };
 
@@ -157,6 +184,19 @@ export default function TareaCard({
                   {tarea.ticketAsociado.prioridad === 'HIGH_PRIORITY' ? 'Alta' :
                    tarea.ticketAsociado.prioridad === 'MEDIUM_PRIORITY' ? 'Media' : 'Baja'}
                 </span>
+                
+                {/* 🆕 Botón desasignar ticket */}
+                {onDesasignarTicket && (
+                  <button
+                    onClick={handleDesasignarTicket}
+                    disabled={desasignandoTicket}
+                    className="px-2 py-1 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Desasignar ticket de esta tarea"
+                  >
+                    {desasignandoTicket ? 'Desasignando...' : 'Desasignar'}
+                  </button>
+                )}
+
                 <Link
                   href="/Proyecto/tickets"
                   className="text-orange-600 hover:text-orange-800 text-xs font-medium"
