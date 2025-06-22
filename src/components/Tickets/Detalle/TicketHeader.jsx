@@ -33,19 +33,19 @@ export default function TicketHeader({ ticket }) {
       <div className="flex justify-between items-center flex-wrap mt-4">
         <div className="flex gap-4">
           <button
-            className="bg-gray-800 text-white px-4 py-2 rounded shadow hover:bg-gray-700"
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors hover:bg-blue-700"
             onClick={() => setModalOpen(true)}
           >
             Editar
           </button>
 
-          <button className="bg-white border px-4 py-2 rounded hover:bg-gray-50">
-            Crear Tarea
+          <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors ">
+           + Crear Tarea
           </button>
         </div>
 
         <button
-          className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700"
+          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium "
           onClick={handleDelete}
         >
           Eliminar

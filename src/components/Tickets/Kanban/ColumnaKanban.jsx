@@ -3,14 +3,14 @@ import Link from "next/link";
 
 export default function ColumnaKanban({ estado, tickets }) {
   const colores = {
-    CREADO: "text-orange-600",
-    "En Progreso": "text-blue-600",
-    ["EN PROGRESO"]: "text-red-600",
-    ["EN ESPERA DE INFORMACION"]: "text-green-600",
-    BLOQUEADO: "text-gray-400",
-    FINALIZADO: "text-purple-600",
-    CANCELADO: "text-gray-500",
-    RECHAZADO: "text-yellow-600",
+    CREADO: "text-indigo-700",
+    "En Progreso": "text-blue-700",
+    ["EN PROGRESO"]: "text-blue-700",
+    ["EN ESPERA DE INFORMACION"]: "text-yellow-600",
+    BLOQUEADO: " text-red-700",
+    FINALIZADO: " text-green-800",
+    CANCELADO: " text-gray-700",
+    RECHAZADO:  " text-red-600",
   };
   return (
     <div className="bg-slate-50 rounded-md shadow-sm border-none  min-w-[15%] px-5">
