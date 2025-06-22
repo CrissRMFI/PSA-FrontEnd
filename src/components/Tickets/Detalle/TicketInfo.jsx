@@ -1,3 +1,5 @@
+import Estado from "@/components/Tickets/Estado";
+
 import {
   mapearSeveridad,
   mapearCliente,
@@ -48,15 +50,14 @@ export default function TicketInfo({ ticket }) {
         <span className="text-gray-600">Prioridad:</span>
         <span>
           <span
-            className={`inline-block px-2 py-0.5 rounded text-white text-xs font-semibold
-              ${
-                ticketFormateado.prioridadLabel == "Alta"
-                  ? "bg-red-600"
-                  : ticketFormateado.prioridadLabel == "Media"
-                  ? "bg-yellow-500"
-                  : "bg-green-600"
+            className={`inline-block px-2 py-0.5 rounded-md text-xs font-semibold
+        ${ticketFormateado.prioridadLabel === "ALTA"
+                ? "bg-red-100 text-red-700"
+                : ticketFormateado.prioridadLabel === "MEDIA"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-green-100 text-green-700"
               }
-            `}
+      `}
           >
             {ticketFormateado.prioridadLabel || "—"}
           </span>
@@ -67,9 +68,7 @@ export default function TicketInfo({ ticket }) {
 
         <span className="text-gray-600">Estado Actual:</span>
         <span>
-          <span className="bg-blue-600 text-white px-2 py-0.5 rounded text-xs font-semibold">
-            {ticket.estadoLabel || "—"}
-          </span>
+          <Estado estado={ticket.estadoLabel || "—"} />
         </span>
 
         <span className="text-gray-600">Fecha de creación:</span>
