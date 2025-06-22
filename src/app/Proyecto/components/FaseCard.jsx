@@ -6,7 +6,7 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
     return new Date(dateString).toLocaleDateString('es-ES');
   };
 
-  // ✅ CAMBIO: Usar index + 1 para el orden visual
+  // Usar index + 1 para el orden visual
   const getOrderIcon = (numeroVisual) => {
     return (
       <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">
@@ -34,7 +34,7 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
     return new Date(fase.fechaFinEstimada) < new Date();
   };
 
-  // ✅ CAMBIO: Calcular número visual basado en el índice
+  // Calcular número visual basado en el índice
   const numeroVisual = index + 1;
 
   return (
@@ -48,7 +48,7 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
         {/* Header de la fase */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
-            {/* ✅ CAMBIO: Usar numeroVisual en lugar de fase.orden */}
+            {/* Usar numeroVisual en lugar de fase.orden */}
             {getOrderIcon(numeroVisual)}
             <div>
               <h3 className="text-xl font-bold text-gray-800">
@@ -133,7 +133,7 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
             <div className={`w-2 h-2 rounded-full mr-2 ${
               index === 0 ? 'bg-green-500' : 'bg-gray-300'
             }`}></div>
-            {/* ✅ CAMBIO: Mostrar número visual pero mantener referencia al ID real */}
+            {/* Mostrar número visual pero mantener referencia al ID real */}
             <span>Fase {numeroVisual}</span>
           </div>
           
@@ -160,7 +160,7 @@ export default function FaseCard({ fase, index, onEdit, onDelete, getEstadoColor
           </Link>
           
           <div className="text-xs text-gray-500">
-            {/* ✅ CAMBIO: Mostrar tanto el orden visual como el orden real del backend */}
+            {/* Mostrar tanto el orden visual como el orden real del backend */}
             Posición: {numeroVisual} | Orden BD: {fase.orden}
           </div>
         </div>

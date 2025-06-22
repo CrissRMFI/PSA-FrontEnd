@@ -420,7 +420,6 @@ class ProyectosService {
       const tareas = await tareasResponse.json();
       const tickets = await ticketsResponse.json();
       
-      // ✅ Crear mapa ticket -> tareas para mejor performance
       const ticketPorTarea = new Map();
       tickets.forEach(ticket => {
         ticket.tareasAsignadas?.forEach(tarea => {
@@ -428,7 +427,6 @@ class ProyectosService {
         });
       });
       
-      // ✅ Agregar ticketAsociado a cada tarea
       const tareasConTickets = tareas.map(tarea => ({
         ...tarea,
         ticketAsociado: ticketPorTarea.get(tarea.idTarea) || null

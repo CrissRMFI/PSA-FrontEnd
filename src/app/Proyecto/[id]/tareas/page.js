@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { proyectosService } from '../../services/proyectosService';
-import { ticketsService } from '../../services/ticketsService'; // 🆕 Importar ticketsService
+import { ticketsService } from '../../services/ticketsService';
 import TareaCard from '../../components/TareaCard';
 import TareaForm from '../../components/TareaForm';
 import DeleteConfirm from '../../components/DeleteConfirm';
@@ -49,7 +49,6 @@ export default function TareasPage() {
       setProyecto(proyectoData);
       setFases(proyectoData.fases || []);
       
-      // ✅ CAMBIO: Usar nuevo método que incluye tickets
       const tareasData = await proyectosService.getTareasConTickets(proyectoId);
       setTareas(tareasData);
       
@@ -158,7 +157,6 @@ export default function TareasPage() {
     }
   };
 
-  // 🆕 Nueva función para desasignar tickets
   const handleDesasignarTicket = async (tareaId, ticketId) => {
     try {
       // Llamar al service para desasignar el ticket
@@ -375,7 +373,7 @@ export default function TareasPage() {
               onEdit={openEditForm}
               onDelete={setDeletingTarea}
               onCambiarEstado={handleCambiarEstado}
-              onDesasignarTicket={handleDesasignarTicket} // 🆕 Pasar la nueva prop
+              onDesasignarTicket={handleDesasignarTicket}
               getEstadoColor={getEstadoColor}
               getPrioridadColor={getPrioridadColor}
               proyectoId={proyectoId}

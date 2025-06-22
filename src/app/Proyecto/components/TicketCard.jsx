@@ -143,7 +143,7 @@ export default function TicketCard({
               {ticket.version && (
                 <>
                   <span className="mx-2">•</span>
-                  <span>v{ticket.version}</span>
+                  <span>Versión: <span className="font-medium">{ticket.version}</span></span>
                 </>
               )}
             </div>
@@ -269,13 +269,7 @@ export default function TicketCard({
           </div>
         )}
 
-        {/* Información del responsable */}
-        {ticket.idResponsable && (
-          <div className="mb-4">
-            <span className="text-sm text-gray-500 mb-1 block">Responsable:</span>
-            <p className="text-sm text-gray-700 font-medium">{ticket.idResponsable}</p>
-          </div>
-        )}
+
 
         {/* Fecha de creación */}
         <div className="mb-4">
@@ -288,11 +282,10 @@ export default function TicketCard({
         {/* Footer con información adicional */}
         <div className="flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
           <div className="flex items-center space-x-4">
-            <span>ID: {ticket.id}</span>
-            <span>Externo: {ticket.ticketExternoId}</span>
             {ticket.asignado && (
-              <span>Tareas: {ticket.cantidadTareasAsignadas}</span>
+              <span>Tareas asignadas: {ticket.cantidadTareasAsignadas}</span>
             )}
+            <span>Prioridad: {ticketsService.obtenerTextoprioridad(ticket.prioridad)}</span>
           </div>
           
           <div className="flex items-center space-x-2">

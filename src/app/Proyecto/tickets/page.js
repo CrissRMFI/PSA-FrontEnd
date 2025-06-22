@@ -53,7 +53,7 @@ export default function TicketsPage() {
       const proyectos = await proyectosService.getAllProyectos();
       setTodosLosProyectos(proyectos);
       
-      // ✅ CAMBIO: Cargar tareas CON tickets usando el método que ya creamos
+      // Cargar tareas CON tickets usando el método que ya creamos
       const tareasPromises = proyectos.map(proyecto => 
         proyectosService.getTareasConTickets(proyecto.idProyecto)  // 🔧 Usar nuevo método
           .then(tareas => tareas.map(tarea => ({

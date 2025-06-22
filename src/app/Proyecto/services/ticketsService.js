@@ -1,8 +1,7 @@
 // services/ticketsService.js
-const API_BASE_URL = ''; // 🔧 Cambio: vacío para que el proxy funcione correctamente
+const API_BASE_URL = '';
 
 class TicketsService {
-  // 🔄 Sincronización
   async sincronizar() {
     const response = await fetch(`${API_BASE_URL}/api/tickets/sincronizar`, {
       method: 'POST',
@@ -18,7 +17,7 @@ class TicketsService {
     return await response.text(); // Retorna mensaje de sincronización
   }
 
-  // 📊 Consultas
+  // Consultas
   async obtenerTodos() {
     const response = await fetch(`${API_BASE_URL}/api/tickets`);
     
@@ -49,7 +48,7 @@ class TicketsService {
     return await response.json();
   }
 
-  // 🔗 Asignación de tareas
+  // Asignación de tareas
   async asignarTareas(ticketId, tareaIds) {
     const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}/asignar-tareas`, {
       method: 'POST',
@@ -83,7 +82,7 @@ class TicketsService {
     return await response.json();
   }
 
-  // 📈 Métricas para dashboard
+  // Métricas para dashboard
   async obtenerMetricas() {
     const tickets = await this.obtenerTodos();
     
@@ -98,7 +97,7 @@ class TicketsService {
     return metricas;
   }
 
-  // 🎨 Utilidades para UI
+  // Utilidades para UI
   obtenerColorPorPrioridad(prioridad) {
     const colores = {
       'HIGH_PRIORITY': 'bg-red-100 text-red-800 border-red-200',

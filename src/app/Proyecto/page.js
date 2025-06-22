@@ -5,7 +5,7 @@ import { proyectosService } from './services/proyectosService';
 import ProyectoForm from './components/ProyectoForm';
 import ProyectoCard from './components/ProyectoCard';
 import DeleteConfirm from './components/DeleteConfirm';
-import TicketBadge from './components/TicketBadge'; // 🆕 Importar TicketBadge
+import TicketBadge from './components/TicketBadge'; // Importar TicketBadge
 
 export default function ProyectosPage() {
   const [proyectos, setProyectos] = useState([]);
@@ -227,7 +227,7 @@ export default function ProyectosPage() {
           <p className="text-3xl font-bold text-gray-600">{estadisticas.cerrados}</p>
         </div>
         
-        {/* 🆕 Nuevo: TicketBadge integrado */}
+        {/* TicketBadge integrado */}
         <TicketBadge />
       </div>
 

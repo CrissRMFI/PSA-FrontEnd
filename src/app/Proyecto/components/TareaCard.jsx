@@ -6,7 +6,7 @@ export default function TareaCard({
   onEdit, 
   onDelete, 
   onCambiarEstado, 
-  onDesasignarTicket, // 🆕 Nueva prop para desasignar ticket
+  onDesasignarTicket, // Nueva prop para desasignar ticket
   getEstadoColor, 
   getPrioridadColor, 
   proyectoId 
@@ -53,7 +53,7 @@ export default function TareaCard({
     }
   };
 
-  // 🆕 Handler para desasignar ticket
+  // Handler para desasignar ticket
   const handleDesasignarTicket = async () => {
     if (!tarea.ticketAsociado || !onDesasignarTicket) return;
     
@@ -155,7 +155,7 @@ export default function TareaCard({
           </div>
         </div>
 
-        {/* 🆕 Información del ticket asignado */}
+        {/* Información del ticket asignado */}
         {tarea.ticketAsociado && (
           <div className="mb-4">
             <span className="text-sm text-gray-500 mb-2 block">Ticket asignado:</span>
@@ -185,7 +185,7 @@ export default function TareaCard({
                    tarea.ticketAsociado.prioridad === 'MEDIUM_PRIORITY' ? 'Media' : 'Baja'}
                 </span>
                 
-                {/* 🆕 Botón desasignar ticket */}
+                {/* Botón desasignar ticket */}
                 {onDesasignarTicket && (
                   <button
                     onClick={handleDesasignarTicket}
@@ -288,7 +288,7 @@ export default function TareaCard({
                   .join(', ')}
               </span>
             )}
-            {/* 🆕 Indicador de ticket */}
+            {/* Indicador de ticket */}
             {tarea.ticketAsociado ? (
               <span className="text-orange-600 font-medium">
                 🎫 Con ticket

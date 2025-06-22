@@ -7,11 +7,11 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
     titulo: '',
     descripcion: '',
     prioridad: 'MEDIA',
-    responsableRecursoId: '', // Campo para recurso
-    ticketAsociadoId: '', // 🆕 Campo para ticket
+    responsableRecursoId: '',
+    ticketAsociadoId: '',
     fechaInicio: '',
     fechaFinEstimada: '',
-    faseIds: [] // Para tareas multifase
+    faseIds: []
   });
 
   const [errors, setErrors] = useState({});
@@ -26,21 +26,20 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         titulo: tarea.titulo || '',
         descripcion: tarea.descripcion || '',
         prioridad: tarea.prioridad || 'MEDIA',
-        responsableRecursoId: tarea.responsableRecursoId || '', // ID del recurso si existe
-        ticketAsociadoId: tarea.ticketAsociado?.id?.toString() || '', // 🆕 ID del ticket si existe
+        responsableRecursoId: tarea.responsableRecursoId || '',
+        ticketAsociadoId: tarea.ticketAsociado?.id?.toString() || '',
         fechaInicio: tarea.fechaInicio || '',
         fechaFinEstimada: tarea.fechaFinEstimada || '',
         faseIds: faseIds
       });
       setIsMultifase(faseIds.length > 1);
     } else {
-      // Valores por defecto para nueva tarea
       setFormData({
         titulo: '',
         descripcion: '',
         prioridad: 'MEDIA',
         responsableRecursoId: '',
-        ticketAsociadoId: '', // 🆕 Sin ticket por defecto
+        ticketAsociadoId: '',
         fechaInicio: proyecto?.fechaInicio || '',
         fechaFinEstimada: proyecto?.fechaFinEstimada || '',
         faseIds: []
@@ -79,7 +78,6 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
     }
   };
 
-  // 🆕 Handler para cambio de ticket
   const handleTicketChange = (ticketAsociadoId) => {
     setFormData(prev => ({
       ...prev,
@@ -168,7 +166,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
 
     setIsSubmitting(true);
     try {
-      // ✅ PASO 1: Preparar datos para crear/editar la tarea (SIN TICKET)
+      // Preparar datos para crear/editar la tarea (SIN TICKET)
       const dataToSubmit = {
         titulo: formData.titulo,
         descripcion: formData.descripcion,
@@ -185,10 +183,10 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
 
       console.log('📤 PASO 1: Creando/editando tarea sin ticket:', dataToSubmit);
       
-      // ✅ PASO 1: Crear/editar la tarea
+      // Crear/editar la tarea
       const tareaResult = await onSubmit(dataToSubmit);
       
-      // ✅ PASO 2: Si hay ticket seleccionado, asignarlo después
+      // Si hay ticket seleccionado, asignarlo después
       const ticketOriginal = tarea?.ticketAsociado?.id?.toString() || '';
       const ticketNuevo = formData.ticketAsociadoId || '';
       
@@ -336,7 +334,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         </div>
       </div>
 
-      {/* 🆕 Selector de Ticket */}
+      {/* Selector de Ticket */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Ticket de Soporte
@@ -352,7 +350,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
           <p className="text-red-600 text-sm mt-1">{errors.ticketAsociadoId}</p>
         )}
         
-        {/* 🆕 Explicación del proceso */}
+        {/* Explicación del proceso */}
         <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div className="flex items-start">
             <svg className="w-4 h-4 text-blue-600 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -489,7 +487,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         )}
       </div>
 
-      {/* 🆕 Resumen de selección actualizado */}
+      {/* Resumen de selección actualizado */}
       {formData.faseIds.length > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <h4 className="font-medium text-green-800 mb-2">
@@ -518,7 +516,7 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         </div>
       )}
 
-      {/* 🆕 Previsualización del ticket seleccionado */}
+      {/* Previsualización del ticket seleccionado */}
       {formData.ticketAsociadoId && (
         <div className="bg-orange-50 p-4 rounded-lg">
           <h4 className="font-medium text-orange-800 mb-2">🎫 Ticket seleccionado:</h4>

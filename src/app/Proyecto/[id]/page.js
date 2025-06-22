@@ -263,7 +263,7 @@ export default function ProyectoDetailPage() {
               .map((fase, index) => (
                 <div key={fase.idFase} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    {/* ✅ CAMBIO: Usar index + 1 para mostrar numeración visual continua */}
+                    {/* Usar index + 1 para mostrar numeración visual continua */}
                     <div className="flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full font-bold text-xs">
                       {index + 1}
                     </div>
