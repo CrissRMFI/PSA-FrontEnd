@@ -166,22 +166,29 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
 
     setIsSubmitting(true);
     try {
-      // Preparar datos para crear/editar la tarea (SIN TICKET)
+      // ✅ CAMBIO: Preparar datos según el backend espera
       const dataToSubmit = {
         titulo: formData.titulo,
         descripcion: formData.descripcion,
         prioridad: formData.prioridad,
         fechaInicio: formData.fechaInicio,
-        fechaFinEstimada: formData.fechaFinEstimada,
-        faseIds: formData.faseIds.map(id => parseInt(id))
+        fechaFinEstimada: formData.fechaFinEstimada
       };
+
+      // ✅ CAMBIO: Para UNA fase, usar faseId (singular)
+      if (formData.faseIds.length === 1) {
+        dataToSubmit.faseId = parseInt(formData.faseIds[0]);
+      } else if (formData.faseIds.length > 1) {
+        // Para múltiples fases, usar faseIds (plural)
+        dataToSubmit.faseIds = formData.faseIds.map(id => parseInt(id));
+      }
 
       // Si hay responsable seleccionado, agregar el ID del recurso
       if (formData.responsableRecursoId) {
         dataToSubmit.responsableRecursoId = formData.responsableRecursoId;
       }
 
-      console.log('📤 PASO 1: Creando/editando tarea sin ticket:', dataToSubmit);
+      console.log('📤 PASO 1: Datos a enviar:', dataToSubmit);
       
       // Crear/editar la tarea
       const tareaResult = await onSubmit(dataToSubmit);
@@ -487,14 +494,20 @@ export default function TareaForm({ tarea, proyecto, fases, onSubmit, onCancel }
         )}
       </div>
 
-      {/* Resumen de selección actualizado */}
+      {/* ✅ RESUMEN CORREGIDO - Mostrar nombres de fases */}
       {formData.faseIds.length > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <h4 className="font-medium text-green-800 mb-2">
             Resumen de la tarea:
           </h4>
           <div className="text-green-700 text-sm space-y-1">
-            <p>• Será asignada a {formData.faseIds.length} fase{formData.faseIds.length > 1 ? 's' : ''}</p>
+            {/* ✅ CAMBIO: Mostrar nombres de fases en lugar de solo cantidad */}
+            <p>• Será asignada a: <span className="font-medium">
+              {formData.faseIds.map(id => 
+                fases.find(f => f.idFase.toString() === id)?.nombre
+              ).filter(Boolean).join(', ')}
+            </span></p>
+            
             <p>• Responsable: {formData.responsableRecursoId ? 'Recurso seleccionado' : 'Sin asignar'}</p>
             <p>• Prioridad: {formData.prioridad}</p>
             <p>• Ticket: {formData.ticketAsociadoId ? 'Se asignará automáticamente' : 'Sin ticket'}</p>

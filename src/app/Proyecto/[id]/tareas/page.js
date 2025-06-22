@@ -62,31 +62,37 @@ export default function TareasPage() {
 
   const handleCreateTarea = async (tareaData) => {
     try {
+      console.log('📤 Datos recibidos para crear tarea:', tareaData);
+      
       let newTarea;
       
-      // Decidir qué endpoint usar según si hay responsable recurso o no
+      // Crear la tarea (el backend ya maneja faseId o faseIds)
       if (tareaData.responsableRecursoId) {
-        // Usar endpoint con recurso
         newTarea = await proyectosService.createTareaConRecurso(proyectoId, tareaData);
       } else {
-        // Usar endpoint tradicional (fallback por compatibilidad)
         newTarea = await proyectosService.createTarea(proyectoId, tareaData);
       }
       
-      // Si se asignaron múltiples fases, usar el endpoint específico
+      console.log('📤 Tarea creada:', newTarea);
+      
+      // ✅ CAMBIO: Solo usar asignarMultiplesFases si se enviaron múltiples fases
+      // (porque el backend ya procesó faseId único en la creación)
       if (tareaData.faseIds && tareaData.faseIds.length > 1) {
+        console.log('📤 Asignando múltiples fases:', tareaData.faseIds);
         await proyectosService.asignarMultiplesFases(newTarea.idTarea, tareaData.faseIds);
+      } else if (tareaData.faseId) {
+        console.log('📤 Fase única asignada en la creación:', tareaData.faseId);
       }
       
       // Recargar tareas para obtener la info actualizada
       await loadTareas();
       setShowForm(false);
       
-      console.log('Tarea creada exitosamente:', newTarea);
+      console.log('✅ Tarea creada exitosamente:', newTarea);
       
     } catch (err) {
       setError('Error al crear la tarea. ' + (err.message || ''));
-      console.error('Error detallado:', err);
+      console.error('❌ Error detallado:', err);
     }
   };
 
