@@ -80,7 +80,7 @@ export default function FormularioTicket({ onClose, onTicketCreado }) {
     }
   };
 
-  const productoSeleccionado = productos.find((p) => p.id === form.idProducto);
+  const productoSeleccionado = productos.find((p) => p.idProducto === form.idProducto);
   const versionesDisponibles = productoSeleccionado?.versiones || [];
 
   console.log("VERSION SEL" + versionesDisponibles)
