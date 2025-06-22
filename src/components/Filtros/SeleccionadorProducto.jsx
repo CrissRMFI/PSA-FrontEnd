@@ -19,7 +19,7 @@ export default function SeleccionadorProducto({
   }, []);
 
   const productosFiltrados = productoSeleccionado
-    ? productos.filter((p) => p.id === productoSeleccionado)
+    ? productos.filter((p) => p.idProducto === productoSeleccionado)
     : productos;
 
   const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina);
@@ -58,21 +58,21 @@ export default function SeleccionadorProducto({
         >
           {productosAMostrar.map((producto) => (
             <div
-              key={producto.id}
+              key={producto.idProducto}
               className={`p-5 rounded-lg border shadow-sm transition-all w-full max-w-sm cursor-pointer
                 ${
-                  productoSeleccionado === producto.id
+                  productoSeleccionado === producto.idProducto
                     ? "border-blue-500 bg-blue-50"
                     : "border-gray-200 hover:bg-slate-50"
                 }`}
-              onClick={() => manejarSeleccion(producto.id)}
+              onClick={() => manejarSeleccion(producto.idProducto)}
             >
               <div className="flex items-center justify-center mb-2 text-blue-400">
                 <Package className="w-6 h-6" />
               </div>
 
               <h3 className="text-lg font-semibold text-slate-700 text-center">
-                {producto.nombre}
+                {producto.nombreProducto}
               </h3>
 
               <p className="text-sm text-blue-500 text-center mt-1">
