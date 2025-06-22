@@ -44,6 +44,21 @@ export default function TicketCard({
     }
   };
 
+  // ✅ NUEVO: Función para determinar si puede asignar tareas
+  const puedeAsignarTareas = () => {
+    return ticket.estado === 'RECIBIDO' || ticket.estado === 'ASIGNADO';
+  };
+
+  // ✅ NUEVO: Texto dinámico del botón
+  const getTextoBotonAsignar = () => {
+    if (ticket.estado === 'RECIBIDO') {
+      return 'Asignar Tareas';
+    } else if (ticket.estado === 'ASIGNADO') {
+      return 'Asignar Más';
+    }
+    return 'Asignar';
+  };
+
   return (
     <div className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border-l-4 ${getColorBorde()}`}>
       <div className="p-6">
@@ -94,14 +109,19 @@ export default function TicketCard({
           {/* Acciones */}
           {showActions && (
             <div className="flex space-x-2 ml-4">
-              {ticket.estado === 'RECIBIDO' && (
+              {/* ✅ CAMBIO: Permitir asignar a RECIBIDO y ASIGNADO */}
+              {puedeAsignarTareas() && (
                 <button
                   onClick={handleAsignar}
                   disabled={loading}
-                  className="px-3 py-1 rounded-lg text-xs font-medium transition-colors bg-blue-100 text-blue-600 hover:bg-blue-200"
-                  title="Asignar tareas a este ticket"
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    ticket.estado === 'RECIBIDO' 
+                      ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                      : 'bg-purple-100 text-purple-600 hover:bg-purple-200'
+                  }`}
+                  title={`${getTextoBotonAsignar()} al ticket ${ticket.codigo}`}
                 >
-                  {loading ? 'Asignando...' : 'Asignar'}
+                  {loading ? 'Procesando...' : getTextoBotonAsignar()}
                 </button>
               )}
 
@@ -167,6 +187,20 @@ export default function TicketCard({
                 ⭐ Ticket Multi-tarea
               </div>
             )}
+          </div>
+        )}
+
+        {/* ✅ NUEVO: Indicador de capacidad de asignación */}
+        {ticket.estado === 'ASIGNADO' && (
+          <div className="mb-4 bg-purple-50 border border-purple-200 rounded-lg p-3">
+            <div className="flex items-center">
+              <svg className="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span className="text-sm text-purple-700 font-medium">
+                Puedes asignar más tareas a este ticket
+              </span>
+            </div>
           </div>
         )}
 
