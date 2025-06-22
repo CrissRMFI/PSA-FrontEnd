@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { getProductos } from "@/api/productos";
-import { Package } from "lucide-react";
+import { Package, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function SeleccionadorProducto({
   onSeleccionarProducto,
   productoSeleccionado,
+  filtroNombre, // <- AÑADIDO
 }) {
   const [productos, setProductos] = useState([]);
   const [paginaActual, setPaginaActual] = useState(1);
@@ -18,9 +19,16 @@ export default function SeleccionadorProducto({
     fetchProductos();
   }, []);
 
-  const productosFiltrados = productoSeleccionado
+  // 🔍 Aplicamos filtro por nombre si está presente
+  const productosFiltradosBase = productoSeleccionado
     ? productos.filter((p) => p.idProducto === productoSeleccionado)
     : productos;
+
+  const productosFiltrados = filtroNombre
+    ? productosFiltradosBase.filter((p) =>
+        p.nombreProducto.toLowerCase().includes(filtroNombre.toLowerCase())
+      )
+    : productosFiltradosBase;
 
   const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina);
   const indiceUltimo = paginaActual * productosPorPagina;
@@ -38,10 +46,10 @@ export default function SeleccionadorProducto({
     }
   };
 
+  const irAPagina = (num) => setPaginaActual(num);
   const siguientePagina = () => {
     if (paginaActual < totalPaginas) setPaginaActual(paginaActual + 1);
   };
-
   const paginaAnterior = () => {
     if (paginaActual > 1) setPaginaActual(paginaActual - 1);
   };
@@ -84,24 +92,50 @@ export default function SeleccionadorProducto({
       </div>
 
       {!productoSeleccionado && totalPaginas > 1 && (
-        <div className="flex justify-center items-center gap-4 mt-5 mb-4">
-          <button
-            onClick={paginaAnterior}
-            disabled={paginaActual === 1}
-            className="px-4 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-          >
-            Anterior
-          </button>
-          <span className="text-sm font-semibold text-slate-600">
-            Página {paginaActual} de {totalPaginas}
-          </span>
-          <button
-            onClick={siguientePagina}
-            disabled={paginaActual === totalPaginas}
-            className="px-4 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-          >
-            Siguiente
-          </button>
+        <div className="flex flex-col items-center justify-center mt-6 space-y-2">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={paginaAnterior}
+              disabled={paginaActual === 1}
+              className={`flex items-center px-3 py-1 rounded-md text-sm transition ${
+                paginaActual === 1
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Anterior
+            </button>
+
+            <div className="flex space-x-1">
+              {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((numeroPagina) => (
+                <button
+                  key={numeroPagina}
+                  onClick={() => irAPagina(numeroPagina)}
+                  className={`px-3 py-1 rounded-md text-sm transition ${
+                    paginaActual === numeroPagina
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {numeroPagina}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={siguientePagina}
+              disabled={paginaActual === totalPaginas}
+              className={`flex items-center px-3 py-1 rounded-md text-sm transition ${
+                paginaActual === totalPaginas
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              Siguiente
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </button>
+          </div>
         </div>
       )}
     </div>

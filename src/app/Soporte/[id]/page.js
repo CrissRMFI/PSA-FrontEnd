@@ -11,6 +11,9 @@ import TicketTareas from "@/components/Tickets/Detalle/TicketTareas";
 import { getProductos } from "@/api/productos";
 import { ArrowLeft } from "lucide-react";
 
+// Importar el mock de tareas
+import tareasMock from "@/api/mock/tareas";
+
 const VistaTicket = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -42,13 +45,17 @@ const VistaTicket = () => {
     fetchTicket();
   }, [id]);
 
+  const tareasDelTicket = ticket
+    ? tareasMock.filter(tarea => tarea.idticket === parseInt(id))
+    : [];
+
   if (loading) return <p className="p-10 text-slate-400">Cargando ticket...</p>;
   if (!ticket) return <p className="p-10 text-red-500">Ticket no encontrado</p>;
 
   return (
     <div className="p-10">
       <div className="w-[90%] mx-auto">
-       
+
         <button
           onClick={() => router.back()}
           className="flex items-center text-sm text-gray-500 hover:text-gray-700 transition mb-4"
@@ -57,10 +64,10 @@ const VistaTicket = () => {
           Volver
         </button>
 
-      
+
         <h2 className="text-4xl text-slate-500 mb-6">{`Soporte / Producto / ${producto}`}</h2>
 
-       
+
         <div className="space-y-8">
           <TicketHeader ticket={ticket} />
 
@@ -71,12 +78,12 @@ const VistaTicket = () => {
 
           <div className="flex-grow h-[2px] bg-gray-200"></div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TicketTareas tareas={[]} />
-          </div>
-        </div>
+        
+          <TicketTareas tareas={tareasDelTicket} />
+        
       </div>
     </div>
+    </div >
   );
 };
 

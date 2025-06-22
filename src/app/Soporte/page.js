@@ -82,7 +82,7 @@ export default function SoportePage() {
           <input
             type="text"
             placeholder="Buscar productos por nombre..."
-            className="border border-gray-300 rounded px-4 py-2 h-10 w-full max-w-[400px] shadow-sm"
+            className="border border-gray-300 rounded px-4 py-2 h-10 w-96 max-w-[400px] shadow-sm"
             value={filtroNombreProducto}
             onChange={(e) => setFiltroNombreProducto(e.target.value)}
           />
