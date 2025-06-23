@@ -20,7 +20,7 @@ export default function TicketHeader({ ticket }) {
     const confirmacion = window.confirm("¿Estás seguro de que querés eliminar este ticket?");
     if (confirmacion) {
       await cancelarTicket(ticket.internalId);
-      window.history.back();  
+      window.location.reload()
     }
   };
   
