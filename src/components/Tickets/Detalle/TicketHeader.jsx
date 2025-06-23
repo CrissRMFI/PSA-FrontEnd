@@ -3,6 +3,7 @@
 import ModalEditarTicket from "@/components/Tickets/EditarTicket/ModalEditarTicket";
 import { useState } from "react";
 import { updateTicket, deleteTicket } from "@/api/tickets";
+import Link from "next/link";
 
 
 export default function TicketHeader({ ticket }) {
@@ -39,9 +40,12 @@ export default function TicketHeader({ ticket }) {
             Editar
           </button>
 
-          <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors ">
-           + Crear Tarea
-          </button>
+        
+          <Link href={"/Proyecto/tickets"}>
+            <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors ">
+             + Crear Tarea
+            </button>
+          </Link>
         </div>
 
         <button
