@@ -8,6 +8,7 @@ import Link from "next/link";
 
 export default function TicketHeader({ ticket }) {
   
+  
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSave = async (data) => {
@@ -42,7 +43,7 @@ export default function TicketHeader({ ticket }) {
 
         
           <Link href={"/Proyecto/tickets"}>
-            <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors ">
+            <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors " disabled={ ticket.estadoLabel === "CANCELADO"}>
              + Crear Tarea
             </button>
           </Link>
@@ -52,7 +53,7 @@ export default function TicketHeader({ ticket }) {
           className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium "
           onClick={handleDelete}
         >
-          Eliminar
+          Cancelar
         </button>
       </div>
 

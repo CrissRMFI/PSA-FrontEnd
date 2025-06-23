@@ -61,9 +61,9 @@ export const updateTicket = async (internalId, data) => {
   return "Ticket actualizado correctamente";
 };
 
-export const deleteTicket = async (id) => {
+export const cancelarTicket = async (id) => {
   const res = await fetch(`${BASE_URL}/${id}`, {
-    method: "DELETE",
+    method: "PUT",
   });
 
   if (!res.ok) {
