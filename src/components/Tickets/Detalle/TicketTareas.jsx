@@ -73,7 +73,7 @@ export default function TicketTareas({ tareas }) {
                     <div>
                       <strong>Responsable:</strong> {tarea.tareaResponsable}
                     </div>
-                    {tarea.nombreProyecto && (
+                    {tarea.nombreProyecto && ( 
                       <div>
                         <strong>Proyecto:</strong> {tarea.proyectoNombre}
                       </div>
