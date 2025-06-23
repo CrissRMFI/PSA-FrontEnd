@@ -2,7 +2,7 @@
 
 import ModalEditarTicket from "@/components/Tickets/EditarTicket/ModalEditarTicket";
 import { useState } from "react";
-import { updateTicket, deleteTicket } from "@/api/tickets";
+import { updateTicket, cancelarTicket } from "@/api/tickets";
 import Link from "next/link";
 
 
@@ -19,7 +19,7 @@ export default function TicketHeader({ ticket }) {
   const handleDelete = async () => {
     const confirmacion = window.confirm("¿Estás seguro de que querés eliminar este ticket?");
     if (confirmacion) {
-      await deleteTicket(ticket.internalId);
+      await cancelarTicket(ticket.internalId);
       window.history.back();  
     }
   };
