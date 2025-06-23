@@ -3,7 +3,8 @@ import Estado from "../Estado";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function TicketTareas({ tareas = [] }) {
+export default function TicketTareas({ tareas }) {
+  
   const [paginaActual, setPaginaActual] = useState(1);
   const tareasPorPagina = 2;
 
@@ -50,31 +51,31 @@ export default function TicketTareas({ tareas = [] }) {
                   className="border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition duration-200"
                 >
                   <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-semibold text-blue-800">{tarea.titulo}</h4>
+                    <h4 className="font-semibold text-blue-800">{tarea.tareaTitulo}</h4>
                     <span
-                      className={`text-xs font-bold px-2 py-1 rounded ${tarea.prioridad === 'Alta'
+                      className={`text-xs font-bold px-2 py-1 rounded ${tarea.tareaPrioridad === 'Alta'
                           ? 'bg-red-100 text-red-700'
-                          : tarea.prioridad === 'Media'
+                          : tarea.tareaPrioridad === 'Media'
                             ? 'bg-yellow-100 text-yellow-700'
                             : 'bg-green-100 text-green-700'
                         }`}
                     >
-                      Prioridad: {tarea.prioridad}
+                      Prioridad: {tarea.tareaPrioridad} 
                     </span>
                   </div>
 
-                  <p className="text-gray-600 mb-3 text-sm">{tarea.descripcion}</p>
+                  <p className="text-gray-600 mb-3 text-sm">{tarea.tareaDescripcion}</p>
 
                   <div className="flex flex-wrap gap-4 text-sm text-gray-700">
                     <div>
-                      <strong>Estado:</strong> <Estado estado={tarea.estado.toUpperCase()} />
+                      <strong>Estado:</strong> <Estado estado={tarea.tareaEstado.toUpperCase()} />
                     </div>
                     <div>
-                      <strong>Responsable:</strong> {tarea.responsable}
+                      <strong>Responsable:</strong> {tarea.tareaResponsable}
                     </div>
                     {tarea.nombreProyecto && (
                       <div>
-                        <strong>Proyecto:</strong> {tarea.nombreProyecto}
+                        <strong>Proyecto:</strong> {tarea.proyectoNombre}
                       </div>
                     )}
                   </div>
@@ -83,7 +84,7 @@ export default function TicketTareas({ tareas = [] }) {
             </div>
           </div>
 
-          {totalPaginas > 1 && (
+          {totalPaginas > 0 && (
             <div className="flex flex-col items-center justify-en mt-4 space-y-2">
               
               <div className="flex items-center space-x-2">

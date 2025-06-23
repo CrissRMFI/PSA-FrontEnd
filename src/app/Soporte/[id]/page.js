@@ -11,7 +11,6 @@ import TicketTareas from "@/components/Tickets/Detalle/TicketTareas";
 import { getProductos } from "@/api/productos";
 import { ArrowLeft } from "lucide-react";
 
-// Importar el mock de tareas
 import tareasMock from "@/api/mock/tareas";
 
 const VistaTicket = () => {
@@ -28,13 +27,7 @@ const VistaTicket = () => {
       try {
         const data = await getTicketById(id);
         setTicket(data);
-        /*
-        const productoNombre = await getProductos();
-        const productoFiltrado = productoNombre.find(
-          (p) => p.id === data.idProducto
-        );
-        setProducto(productoFiltrado ? productoFiltrado.nombre : "Desconocido");
-        */
+        
       } catch (error) {
         console.error("Error al obtener el ticket:", error);
       } finally {
@@ -79,7 +72,7 @@ const VistaTicket = () => {
           <div className="flex-grow h-[2px] bg-gray-200"></div>
 
         
-          <TicketTareas tareas={tareasDelTicket} />
+          <TicketTareas tareas={ticket.tasks} />
         
       </div>
     </div>

@@ -12,28 +12,8 @@ import { useState, useEffect } from "react";
 import { getClientes, getResponsables } from "@/api/serviciosExternos";
 
 export default function TicketInfo({ ticket }) {
-  /*
-  const [clientes, setClientes] = useState([]);
-  const [responsables, setResponsables] = useState([]);
-
-  useEffect(() => {
-    const fetchClientesYResponsables = async () => {
-      try {
-        const [clientesData, responsablesData] = await Promise.all([
-          getClientes(),
-          getResponsables(),
-        ]);
-        setClientes(clientesData);
-        setResponsables(responsablesData);
-      } catch (error) {
-        console.error("Error al obtener clientes o responsables:", error);
-      }
-    };
-    fetchClientesYResponsables();
-  }, []);
-  */
-
-  const ticketFormateado = ticket; //mapearTicketConDatos(ticket, clientes, responsables);
+  
+  const ticketFormateado = ticket;
 
   return (
     <div className="p-4 shadow-2xl bg-white space-y-2 text-sm hover:shadow-sky-950 rounded-md h-full">
